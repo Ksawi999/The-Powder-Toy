@@ -1179,9 +1179,9 @@ void GameSave::readOPS(const std::vector<char> &data)
 							}
 						}
 					case PT_VSNS:
-						if(savedVersion < 97 && !fakeNewerVersion)
+						if (savedVersion < 97 && !fakeNewerVersion)
 						{
-							if(particles[newIndex].tmp == 1 || particles[newIndex].tmp == 3)
+							if (particles[newIndex].tmp == 1 || particles[newIndex].tmp == 3)
 								particles[newIndex].temp = 4.0f + 273.15f;
 						}
 					}
