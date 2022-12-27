@@ -74,6 +74,12 @@ static int update(UPDATE_FUNC_ARGS)
 					}
 				}
 	}
+	if (parts[i].tmp == 1 || parts[i].tmp == 3)
+	{
+		if (parts[i].temp < 273.15f + 1.0f) parts[i].temp = 273.15f + 1.0f;
+		else if (parts[i].temp > 273.15f + 32.0f) parts[i].temp = 273.15f + 32.0f;
+	}
+	float precision = floor(parts[i].temp - 0.15f) / 4.0f;
 	bool doSerialization = false;
 	bool doDeserialization = false;
 	float Vs = 0;
@@ -97,7 +103,7 @@ static int update(UPDATE_FUNC_ARGS)
 					if (TYP(r) != PT_VSNS && TYP(r) != PT_FILT && !(sim->elements[TYP(r)].Properties & TYPE_SOLID))
 					{
 						doSerialization = true;
-						Vs = Vm;
+						Vs = Vm * precision;
 					}
 					break;
 				case 3:
@@ -108,7 +114,7 @@ static int update(UPDATE_FUNC_ARGS)
 						if (vel >= 0 && vel < SIM_MAXVELOCITY)
 						{
 							doDeserialization = true;
-							Vs = float(vel);
+							Vs = float(vel) / precision;
 						}
 					}
 					break;
