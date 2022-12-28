@@ -4341,15 +4341,96 @@ killed:
 
 					if (t == PT_PHOT)
 					{
-						auto mask = elements[TYP(r)].PhotonReflectWavelengths;
-						if (TYP(r) == PT_LITH)
+						unsigned int mask = 0;
+						if (TYP(r) != PT_LITH)
+						{
+							int cr = PIXR(elements[TYP(r)].Colour);
+							int cg = PIXG(elements[TYP(r)].Colour);
+							int cb = PIXB(elements[TYP(r)].Colour);
+							if(!(ren->graphicscache[TYP(r)].pixel_mode & NO_DECO))
+							{
+								int da = (parts[ID(r)].dcolour>>24)&0xFF;
+								int dr = (parts[ID(r)].dcolour>>16)&0xFF;
+								int dg = (parts[ID(r)].dcolour>>8)&0xFF;
+								int db = (parts[ID(r)].dcolour)&0xFF;
+								cr = (da*dr + (256-da)*cr) >> 8;
+								cg = (da*dg + (256-da)*cg) >> 8;
+								cb = (da*db + (256-da)*cb) >> 8;
+							}
+							float vl = std::max(std::max(cr, cg), cb);
+							if (vl == 0.0f)
+							{
+								kill_part(i);
+								continue;
+							}
+							int mt = 5;
+							int best = 1000;
+							int bestmt = mt;
+							int vr, vg, vb;
+							for (; mt < 13; mt++)
+							{
+								vr = (int)(cr / vl * mt + 0.5f);
+								vg = (int)(cg / vl * mt + 0.5f);
+								vb = (int)(cb / vl * mt + 0.5f);
+								if ((mt < 7 || vr + vb >= mt - 6) && (mt < 10 || vg >= std::max(cr - 9, 0) + std::max(br - 9, 0)))
+								{
+									int diff = std::abs(cr - vr * vl / mt) + std::abs(cg - vg * vl / mt) + std::abs(cb - vb * vl / mt);
+									if (diff <= best)
+									{
+										best = diff;
+										bestmt = mt;
+									}
+								}
+							}
+							mt = bestmt;
+							vr = (int)(cr / vl * mt + 0.5f);
+							vg = (int)(cg / vl * mt + 0.5f);
+							vb = (int)(cb / vl * mt + 0.5f);
+							int vy = 0;
+							if (vg > 0 && vr > 9)
+							{
+								vy = vr - 9;
+								vg = vg - vy;
+								vr = 9;
+							}
+							int vc = 0;
+							if (vg > 0 && vb > 9)
+							{
+								vc = vb - 9;
+								vg = vg - vc;
+								vb = 9;
+							}
+							if (vg > 6)
+							{
+								int df = vg - 6;
+								int dfr = std:min(vr, df / 2);
+								vr -= dfr;
+								vy += dfr;
+								vb -= df - dfr;
+								vc += df - dfr;
+								vg = 6;
+							}
+							mask = ((1 << vr) - 1) << 21;
+							mask |= ((1 << vy) - 1) << 18;
+							mask |= ((1 << vb) - 1) << 12;
+							mask |= ((1 << vc) - 1) << 9;
+							mask |= ((1 << vb) - 1);
+							parts[i].ctype &= mask;
+							parts[i].life /= (255 / vl);
+							if (parts[i].life < 2)
+							{
+								kill_part(i);
+								continue;
+							}
+						}
+						else if (TYP(r) == PT_LITH)
 						{
 							int wl_bin = parts[ID(r)].ctype / 4;
 							if (wl_bin < 0) wl_bin = 0;
 							if (wl_bin > 25) wl_bin = 25;
 							mask = (0x1F << wl_bin);
+							parts[i].ctype &= mask;
 						}
-						parts[i].ctype &= mask;
 					}
 
 					if (get_normal_interp(t, parts[i].x, parts[i].y, parts[i].vx, parts[i].vy, &nrx, &nry))
