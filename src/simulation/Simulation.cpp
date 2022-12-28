@@ -4386,35 +4386,12 @@ killed:
 							vr = (int)(cr / vl * mt + 0.5f);
 							vg = (int)(cg / vl * mt + 0.5f);
 							vb = (int)(cb / vl * mt + 0.5f);
-							int vy = 0;
-							if (vg > 0 && vr > 9)
-							{
-								vy = vr - 9;
-								vg = vg - vy;
-								vr = 9;
-							}
-							int vc = 0;
-							if (vg > 0 && vb > 9)
-							{
-								vc = vb - 9;
-								vg = vg - vc;
-								vb = 9;
-							}
-							if (vg > 6)
-							{
-								int df = vg - 6;
-								int dfr = std:min(vr, df / 2);
-								vr -= dfr;
-								vy += dfr;
-								vb -= df - dfr;
-								vc += df - dfr;
-								vg = 6;
-							}
+							if (vb > 9)
+								vg -= vb - 9;
 							mask = ((1 << vr) - 1) << 21;
-							mask |= ((1 << vy) - 1) << 18;
-							mask |= ((1 << vb) - 1) << 12;
-							mask |= ((1 << vc) - 1) << 9;
+							mask |= ((1 << vg) - 1) << 12;
 							mask |= ((1 << vb) - 1);
+							mask &= 0x3FFFFFFF;
 							parts[i].ctype &= mask;
 							parts[i].life /= (255 / vl);
 							if (parts[i].life < 2)
