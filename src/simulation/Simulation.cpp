@@ -4347,7 +4347,7 @@ killed:
 							int cr = PIXR(elements[TYP(r)].Colour);
 							int cg = PIXG(elements[TYP(r)].Colour);
 							int cb = PIXB(elements[TYP(r)].Colour);
-							if(!(ren->graphicscache[TYP(r)].pixel_mode & NO_DECO))
+							if(parts[ID(r)].dcolour)
 							{
 								int da = (parts[ID(r)].dcolour>>24)&0xFF;
 								int dr = (parts[ID(r)].dcolour>>16)&0xFF;
@@ -4372,7 +4372,7 @@ killed:
 								vr = (int)(cr / vl * mt + 0.5f);
 								vg = (int)(cg / vl * mt + 0.5f);
 								vb = (int)(cb / vl * mt + 0.5f);
-								if ((mt < 7 || vr + vb >= mt - 6) && (mt < 10 || vg >= std::max(cr - 9, 0) + std::max(br - 9, 0)))
+								if ((mt < 7 || vr + vb >= mt - 6) && (mt < 10 || vg >= std::max(cr - 9, 0) + std::max(cb - 9, 0)))
 								{
 									int diff = std::abs(cr - vr * vl / mt) + std::abs(cg - vg * vl / mt) + std::abs(cb - vb * vl / mt);
 									if (diff <= best)
@@ -4386,10 +4386,22 @@ killed:
 							vr = (int)(cr / vl * mt + 0.5f);
 							vg = (int)(cg / vl * mt + 0.5f);
 							vb = (int)(cb / vl * mt + 0.5f);
-							if (vb > 9)
-								vg -= vb - 9;
-							mask = ((1 << vr) - 1) << 21;
-							mask |= ((1 << vg) - 1) << 12;
+							int shg = 0;
+							if (vg > 6)
+							{
+								shg = std:max(std:min(std:max(std:min(vr - vb, vg - 6), 6 - vg), -3), 3);
+								vr -= std:max(shg, 0);
+								vb += std:min(shg, 0);
+							}
+							else
+							{
+								if (vb > 9)
+									vg -= vb - 9;
+								if (vr > 9)
+									vg -= vr - 9;
+							}
+							mask = (0xFFF - ((1 << vr) - 1)) << 18;
+							mask |= ((1 << vg) - 1) << (12 + shg);
 							mask |= ((1 << vb) - 1);
 							mask &= 0x3FFFFFFF;
 							parts[i].ctype &= mask;
