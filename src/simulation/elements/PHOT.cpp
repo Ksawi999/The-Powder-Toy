@@ -126,7 +126,7 @@ static int graphics(GRAPHICS_FUNC_ARGS)
 	}
 	for (x=0; x<12; x++)
 		*colg += (cpart->ctype >> (x+9))  & 1;
-	x = 624/(*colr+*colg+*colb+1);
+	x = std::min(cpart->life, 680) * 624/(*colr+*colg+*colb+1) / 680;
 	*colr *= x;
 	*colg *= x;
 	*colb *= x;
