@@ -4389,9 +4389,9 @@ killed:
 							int shg = 0;
 							if (vg > 6)
 							{
-								shg = std:max(std:min(std:max(std:min(vr - vb, vg - 6), 6 - vg), -3), 3);
-								vr -= std:max(shg, 0);
-								vb += std:min(shg, 0);
+								shg = std::max(std::min(std::max(std::min(vr - vb, vg - 6), 6 - vg), -3), 3);
+								vr -= std::max(shg, 0);
+								vb += std::min(shg, 0);
 							}
 							else
 							{
