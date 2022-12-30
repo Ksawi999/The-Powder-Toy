@@ -131,7 +131,7 @@ static int graphics(GRAPHICS_FUNC_ARGS)
 	*colg *= x;
 	*colb *= x;
 
-	*firea = 100;
+	*firea = 100 * std::min(cpart->life, 680) / 680;
 	*firer = *colr;
 	*fireg = *colg;
 	*fireb = *colb;
