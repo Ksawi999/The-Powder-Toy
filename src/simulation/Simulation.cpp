@@ -4400,7 +4400,7 @@ killed:
 								if (vr > 9)
 									vg -= vr - 9;
 							}
-							mask = (0xFFF - ((1 << vr) - 1)) << 18;
+							mask = ((1 << vr) - 1) << (30 - vr);
 							mask |= ((1 << vg) - 1) << (12 + shg);
 							mask |= ((1 << vb) - 1);
 							mask &= 0x3FFFFFFF;
