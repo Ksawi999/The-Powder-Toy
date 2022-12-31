@@ -131,7 +131,7 @@ static int graphics(GRAPHICS_FUNC_ARGS)
 	if (cpart->life <= 0)
 	{
 		tozero = true;
-		cpart->life = 680
+		cpart->life = 680;
 	}
 
 	x = std::min(cpart->life, 680) * 624/(*colr+*colg+*colb+1) / 680;
