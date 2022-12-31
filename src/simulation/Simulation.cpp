@@ -4372,7 +4372,7 @@ killed:
 								vr = (int)(cr / vl * mt + 0.5f);
 								vg = (int)(cg / vl * mt + 0.5f);
 								vb = (int)(cb / vl * mt + 0.5f);
-								if ((mt < 7 || vr + vb >= mt - 6) && (mt < 10 || vg >= std::max(cr - 9, 0) + std::max(cb - 9, 0)))
+								if ((mt < 7 || vr + vb >= mt - 6) && (mt < 10 || vg >= std::max(vr - 9, 0) + std::max(vb - 9, 0)))
 								{
 									int diff = std::abs(cr - vr * vl / mt) + std::abs(cg - vg * vl / mt) + std::abs(cb - vb * vl / mt);
 									if (diff <= best)
@@ -4389,7 +4389,7 @@ killed:
 							int shg = 0;
 							if (vg > 6)
 							{
-								shg = std::max(std::min(std::max(std::min(vr - vb, vg - 6), 6 - vg), -3), 3);
+								shg = std::min(std::max(std::max(std::min(vr - vb, vg - 6), 6 - vg), -3), 3);
 								vr -= std::max(shg, 0);
 								vb += std::min(shg, 0);
 							}
