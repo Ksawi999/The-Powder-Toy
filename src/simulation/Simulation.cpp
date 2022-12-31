@@ -4405,11 +4405,14 @@ killed:
 							mask |= ((1 << vb) - 1);
 							mask &= 0x3FFFFFFF;
 							parts[i].ctype &= mask;
-							parts[i].life /= (255 / vl);
-							if (parts[i].life < 2)
+							if (parts[i].life > 0)
 							{
-								kill_part(i);
-								continue;
+								parts[i].life /= (255 / vl);
+								if (parts[i].life < 2)
+								{
+									kill_part(i);
+									continue;
+								}
 							}
 						}
 						else if (TYP(r) == PT_LITH)
