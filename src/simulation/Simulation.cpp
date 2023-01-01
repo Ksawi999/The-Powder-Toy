@@ -4342,7 +4342,7 @@ killed:
 					if (t == PT_PHOT)
 					{
 						unsigned int mask = 0;
-						if (TYP(r) != PT_LITH)
+						if (TYP(r) != PT_LITH && elements[TYP(r)].MenuSection != SC_SPECIAL && elements[TYP(r)].MenuSection > SC_FORCE)
 						{
 							int cr = PIXR(elements[TYP(r)].Colour);
 							int cg = PIXG(elements[TYP(r)].Colour);
