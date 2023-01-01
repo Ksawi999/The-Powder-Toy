@@ -126,15 +126,26 @@ static int graphics(GRAPHICS_FUNC_ARGS)
 	}
 	for (x=0; x<12; x++)
 		*colg += (cpart->ctype >> (x+9))  & 1;
-	x = 624/(*colr+*colg+*colb+1);
+
+	bool tozero = false;
+	if (cpart->life <= 0)
+	{
+		tozero = true;
+		cpart->life = 680;
+	}
+
+	x = std::min(cpart->life, 680) * 624/(*colr+*colg+*colb+1) / 680;
 	*colr *= x;
 	*colg *= x;
 	*colb *= x;
 
-	*firea = 100;
+	*firea = 100 * std::min(cpart->life, 680) / 680;
 	*firer = *colr;
 	*fireg = *colg;
 	*fireb = *colb;
+
+	if (tozero)
+		cpart->life = 0;
 
 	*pixel_mode &= ~PMODE_FLAT;
 	*pixel_mode |= FIRE_ADD | PMODE_ADD | NO_DECO;
