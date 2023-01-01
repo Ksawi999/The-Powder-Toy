@@ -24,8 +24,6 @@ Element::Element():
 	Explosive(0),
 	Meltable(0),
 	Hardness(30),
-	PhotonReflectWavelengths(0x3FFFFFFF),
-
 	Weight(50),
 
 	HeatConduct(128),
