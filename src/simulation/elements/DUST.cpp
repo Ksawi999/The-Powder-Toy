@@ -23,8 +23,6 @@ void Element::Element_DUST()
 	Explosive = 0;
 	Meltable = 0;
 	Hardness = 30;
-	PhotonReflectWavelengths = 0x3FFFFFC0;
-
 	Weight = 85;
 
 	HeatConduct = 70;
