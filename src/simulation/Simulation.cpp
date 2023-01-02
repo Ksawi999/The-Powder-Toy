@@ -2695,8 +2695,11 @@ int Simulation::try_move(int i, int x, int y, int nx, int ny)
 			case PT_BIZR:
 			case PT_BIZRG:
 			case PT_BIZRS:
-				part_change_type(i, x, y, PT_ELEC);
-				parts[i].ctype = 0;
+				if (parts[ID(r)].tmp != 1)
+				{
+					part_change_type(i, x, y, PT_ELEC);
+					parts[i].ctype = 0;
+				}
 				break;
 			case PT_H2:
 				if (!(parts[i].tmp&0x1))
