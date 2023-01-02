@@ -24,6 +24,7 @@ Element::Element():
 	Explosive(0),
 	Meltable(0),
 	Hardness(30),
+
 	Weight(50),
 
 	HeatConduct(128),
