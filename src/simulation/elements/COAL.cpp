@@ -26,6 +26,7 @@ void Element::Element_COAL()
 	Explosive = 0;
 	Meltable = 0;
 	Hardness = 20;
+
 	Weight = 100;
 
 	HeatConduct = 200;
