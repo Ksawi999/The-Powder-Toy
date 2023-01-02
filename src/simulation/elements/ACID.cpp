@@ -26,6 +26,7 @@ void Element::Element_ACID()
 	Explosive = 0;
 	Meltable = 0;
 	Hardness = 0;
+
 	Weight = 10;
 
 	HeatConduct = 34;
