@@ -23,6 +23,7 @@ void Element::Element_NITR()
 	Explosive = 2;
 	Meltable = 0;
 	Hardness = 3;
+
 	Weight = 23;
 
 	HeatConduct = 50;
