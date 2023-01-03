@@ -66,7 +66,7 @@ static int update(UPDATE_FUNC_ARGS)
 			cg = (parts[i].ctype >> (x+9))  & 1;
 			cb = (parts[i].ctype >>  x)     & 1;
 		}
-		x = std::min(cpart->life, 680) * 624/(cr+cg+cb+1) / 680;
+		x = std::min(parts[i].life, 680) * 624/(cr+cg+cb+1) / 680;
 		cr *= x;
 		cg *= x;
 		cb *= x;
@@ -78,7 +78,7 @@ static int update(UPDATE_FUNC_ARGS)
 		cg = (da*dg + (256-da)*cg) >> 8;
 		cb = (da*db + (256-da)*cb) >> 8;
 		parts[i].ctype = colourToWavelength(cr, cg, cb, parts[i].life);
-		cpart->dcolour = 0;
+		parts[i].dcolour = 0;
 	}
 
 	int r, rx, ry;
@@ -208,7 +208,54 @@ static void create(ELEMENT_CREATE_FUNC_ARGS)
 		sim->parts[i].ctype = Element_FILT_interactWavelengths(&sim->parts[ID(sim->pmap[y][x])], sim->parts[i].ctype);
 }
 
-static int colourToWavelength(int &cr, int &cg, int &cb, int &life)
+static int colourToWavelength(int cr, int cg, int cb, int &life)
 {
-
+	float vl = std::max(std::max(cr, cg), cb);
+	if (vl == 0.0f)
+		vl = 1.0f;
+	int mt = 5;
+	int best = 1000;
+	int bestmt = mt;
+	int vr, vg, vb;
+	for (; mt < 13; mt++)
+	{
+		vr = (int)(cr / vl * mt + 0.5f);
+		vg = (int)(cg / vl * mt + 0.5f);
+		vb = (int)(cb / vl * mt + 0.5f);
+		if ((mt < 7 || vr + vb >= mt - 6) && (mt < 10 || vg >= std::max(vr - 9, 0) + std::max(vb - 9, 0)))
+		{
+			int diff = std::abs(cr - vr * vl / mt) + std::abs(cg - vg * vl / mt) + std::abs(cb - vb * vl / mt);
+			if (diff <= best)
+			{
+				best = diff;
+				bestmt = mt;
+			}
+		}
+	}
+	mt = bestmt;
+	vr = (int)(cr / vl * mt + 0.5f);
+	vg = (int)(cg / vl * mt + 0.5f);
+	vb = (int)(cb / vl * mt + 0.5f);
+	int shg = 0;
+	if (vg > 6)
+	{
+		shg = std::min(std::max(std::max(std::min(vr - vb, vg - 6), 6 - vg), -3), 3);
+		vr -= std::max(shg, 0);
+		vb += std::min(shg, 0);
+	}
+	else
+	{
+		if (vb > 9)
+			vg -= vb - 9;
+		if (vr > 9)
+			vg -= vr - 9;
+	}
+	unsigned int mask = ((1 << vr) - 1) << (30 - vr);
+	mask |= ((1 << vg) - 1) << (12 + shg);
+	mask |= ((1 << vb) - 1);
+	mask &= 0x3FFFFFFF;
+	life = vl;
+	if (life < 2)
+		life = 2;
+	return mask;
 }
