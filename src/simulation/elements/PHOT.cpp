@@ -4,6 +4,7 @@ int Element_FIRE_update(UPDATE_FUNC_ARGS);
 static int update(UPDATE_FUNC_ARGS);
 static int graphics(GRAPHICS_FUNC_ARGS);
 static void create(ELEMENT_CREATE_FUNC_ARGS);
+static int colourToWavelength(int &cr, int &cg, int &cb, int &life);
 
 void Element::Element_PHOT()
 {
@@ -59,12 +60,16 @@ static int update(UPDATE_FUNC_ARGS)
 	// process dcolour into ctype (prevent subframe disorder)
 	if (cpart->dcolour)
 	{
-		int cr, cg, cb;
+		int cr, cg, cb, x;
 		for (x=0; x<12; x++) {
-			cr = (cpart->ctype >> (x+18)) & 1;
-			cg = (cpart->ctype >> (x+9))  & 1;
-			cb = (cpart->ctype >>  x)     & 1;
+			cr = (parts[i].ctype >> (x+18)) & 1;
+			cg = (parts[i].ctype >> (x+9))  & 1;
+			cb = (parts[i].ctype >>  x)     & 1;
 		}
+		x = std::min(cpart->life, 680) * 624/(cr+cg+cb+1) / 680;
+		cr *= x;
+		cg *= x;
+		cb *= x;
 		int da = (parts[i].dcolour>>24)&0xFF;
 		int dr = (parts[i].dcolour>>16)&0xFF;
 		int dg = (parts[i].dcolour>>8)&0xFF;
@@ -72,7 +77,7 @@ static int update(UPDATE_FUNC_ARGS)
 		cr = (da*dr + (256-da)*cr) >> 8;
 		cg = (da*dg + (256-da)*cg) >> 8;
 		cb = (da*db + (256-da)*cb) >> 8;
-		// some code here
+		parts[i].ctype = colourToWavelength(cr, cg, cb, parts[i].life);
 		cpart->dcolour = 0;
 	}
 
@@ -149,14 +154,18 @@ static int graphics(GRAPHICS_FUNC_ARGS)
 	// process dcolour into ctype (only when added after update)
 	if (cpart->dcolour)
 	{
+		x = std::min(cpart->life, 680) * 624/(*colr+*colg+*colb+1) / 680;
+		*colr *= x;
+		*colg *= x;
+		*colb *= x;
 		int da = (cpart->dcolour>>24)&0xFF;
 		int dr = (cpart->dcolour>>16)&0xFF;
 		int dg = cpart->dcolour>>8)&0xFF;
 		int db = cpart->dcolour&0xFF;
-		*colr = (da*dr + (256-da)*cr) >> 8;
-		*colg = (da*dg + (256-da)*cg) >> 8;
-		*colb = (da*db + (256-da)*cb) >> 8;
-		//some code here
+		*colr = (da*dr + (256-da) * *colr) >> 8;
+		*colg = (da*dg + (256-da) * *colg) >> 8;
+		*colb = (da*db + (256-da) * *colb) >> 8;
+		cpart->ctype = colourToWavelength(*colr, *colg, *colb, cpart->life);
 		cpart->dcolour = 0;
 	}
 
@@ -197,4 +206,9 @@ static void create(ELEMENT_CREATE_FUNC_ARGS)
 	int Element_FILT_interactWavelengths(Particle* cpart, int origWl);
 	if (TYP(sim->pmap[y][x]) == PT_FILT)
 		sim->parts[i].ctype = Element_FILT_interactWavelengths(&sim->parts[ID(sim->pmap[y][x])], sim->parts[i].ctype);
+}
+
+static int colourToWavelength(int &cr, int &cg, int &cb, int &life)
+{
+
 }
