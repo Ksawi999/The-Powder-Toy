@@ -56,6 +56,26 @@ void Element::Element_PHOT()
 
 static int update(UPDATE_FUNC_ARGS)
 {
+	// process dcolour into ctype (prevent subframe disorder)
+	if (cpart->dcolour)
+	{
+		int cr, cg, cb;
+		for (x=0; x<12; x++) {
+			cr = (cpart->ctype >> (x+18)) & 1;
+			cg = (cpart->ctype >> (x+9))  & 1;
+			cb = (cpart->ctype >>  x)     & 1;
+		}
+		int da = (parts[i].dcolour>>24)&0xFF;
+		int dr = (parts[i].dcolour>>16)&0xFF;
+		int dg = (parts[i].dcolour>>8)&0xFF;
+		int db = parts[i].dcolour&0xFF;
+		cr = (da*dr + (256-da)*cr) >> 8;
+		cg = (da*dg + (256-da)*cg) >> 8;
+		cb = (da*db + (256-da)*cb) >> 8;
+		// some code here
+		cpart->dcolour = 0;
+	}
+
 	int r, rx, ry;
 	float rr, rrr;
 	if (!(parts[i].ctype&0x3FFFFFFF)) {
@@ -122,10 +142,23 @@ static int graphics(GRAPHICS_FUNC_ARGS)
 	*colr = *colg = *colb = 0;
 	for (x=0; x<12; x++) {
 		*colr += (cpart->ctype >> (x+18)) & 1;
+		*colg += (cpart->ctype >> (x+9))  & 1;
 		*colb += (cpart->ctype >>  x)     & 1;
 	}
-	for (x=0; x<12; x++)
-		*colg += (cpart->ctype >> (x+9))  & 1;
+
+	// process dcolour into ctype (only when added after update)
+	if (cpart->dcolour)
+	{
+		int da = (cpart->dcolour>>24)&0xFF;
+		int dr = (cpart->dcolour>>16)&0xFF;
+		int dg = cpart->dcolour>>8)&0xFF;
+		int db = cpart->dcolour&0xFF;
+		*colr = (da*dr + (256-da)*cr) >> 8;
+		*colg = (da*dg + (256-da)*cg) >> 8;
+		*colb = (da*db + (256-da)*cb) >> 8;
+		//some code here
+		cpart->dcolour = 0;
+	}
 
 	bool tozero = false;
 	if (cpart->life <= 0)
