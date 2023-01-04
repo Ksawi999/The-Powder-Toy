@@ -58,7 +58,7 @@ void Element::Element_PHOT()
 static int update(UPDATE_FUNC_ARGS)
 {
 	// process dcolour into ctype (prevent subframe disorder)
-	if (cpart->dcolour)
+	if (parts[i].dcolour)
 	{
 		int cr, cg, cb, x;
 		for (x=0; x<12; x++) {
