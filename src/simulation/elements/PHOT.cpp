@@ -4,7 +4,7 @@ int Element_FIRE_update(UPDATE_FUNC_ARGS);
 static int update(UPDATE_FUNC_ARGS);
 static int graphics(GRAPHICS_FUNC_ARGS);
 static void create(ELEMENT_CREATE_FUNC_ARGS);
-static int colourToWavelength(int &cr, int &cg, int &cb, int &life);
+static int colourToWavelength(int cr, int cg, int cb, int &life);
 
 void Element::Element_PHOT()
 {
@@ -160,7 +160,7 @@ static int graphics(GRAPHICS_FUNC_ARGS)
 		*colb *= x;
 		int da = (cpart->dcolour>>24)&0xFF;
 		int dr = (cpart->dcolour>>16)&0xFF;
-		int dg = cpart->dcolour>>8)&0xFF;
+		int dg = (cpart->dcolour>>8)&0xFF;
 		int db = cpart->dcolour&0xFF;
 		*colr = (da*dr + (256-da) * *colr) >> 8;
 		*colg = (da*dg + (256-da) * *colg) >> 8;
