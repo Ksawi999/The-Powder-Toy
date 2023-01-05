@@ -57,8 +57,8 @@ void Element::Element_PHOT()
 
 static int update(UPDATE_FUNC_ARGS)
 {
-	// process dcolour into ctype (prevent subframe disorder)
-	if (parts[i].dcolour)
+	// process dcolour into ctype
+	if (parts[i].dcolour != parts[i].tmp)
 	{
 		int cr, cg, cb, x;
 		for (x=0; x<12; x++) {
@@ -78,7 +78,16 @@ static int update(UPDATE_FUNC_ARGS)
 		cg = (da*dg + (256-da)*cg) >> 8;
 		cb = (da*db + (256-da)*cb) >> 8;
 		parts[i].ctype = colourToWavelength(cr, cg, cb, parts[i].life);
-		parts[i].dcolour = 0;
+		for (x=0; x<12; x++) {
+			cr = (parts[i].ctype >> (x+18)) & 1;
+			cg = (parts[i].ctype >> (x+9))  & 1;
+			cb = (parts[i].ctype >>  x)     & 1;
+		}
+		x = std::min(parts[i].life, 680) * 624/(cr+cg+cb+1) / 680;
+		cr *= x;
+		cg *= x;
+		cb *= x;
+		parts[i].tmp = parts[i].dcolour = 0xFF000000|(cr << 16)|(cg << 8)|cb;
 	}
 
 	int r, rx, ry;
@@ -143,31 +152,9 @@ static int update(UPDATE_FUNC_ARGS)
 
 static int graphics(GRAPHICS_FUNC_ARGS)
 {
-	int x = 0;
-	*colr = *colg = *colb = 0;
-	for (x=0; x<12; x++) {
-		*colr += (cpart->ctype >> (x+18)) & 1;
-		*colg += (cpart->ctype >> (x+9))  & 1;
-		*colb += (cpart->ctype >>  x)     & 1;
-	}
-
-	// process dcolour into ctype (only when added after update)
-	if (cpart->dcolour)
-	{
-		x = std::min(cpart->life, 680) * 624/(*colr+*colg+*colb+1) / 680;
-		*colr *= x;
-		*colg *= x;
-		*colb *= x;
-		int da = (cpart->dcolour>>24)&0xFF;
-		int dr = (cpart->dcolour>>16)&0xFF;
-		int dg = (cpart->dcolour>>8)&0xFF;
-		int db = cpart->dcolour&0xFF;
-		*colr = (da*dr + (256-da) * *colr) >> 8;
-		*colg = (da*dg + (256-da) * *colg) >> 8;
-		*colb = (da*db + (256-da) * *colb) >> 8;
-		cpart->ctype = colourToWavelength(*colr, *colg, *colb, cpart->life);
-		cpart->dcolour = 0;
-	}
+	*colr = (cpart->dcolour>>16)&0xFF;
+	*colg = (cpart->dcolour>>8)&0xFF;
+	*colb = cpart->dcolour&0xFF;
 
 	bool tozero = false;
 	if (cpart->life <= 0)
@@ -175,11 +162,6 @@ static int graphics(GRAPHICS_FUNC_ARGS)
 		tozero = true;
 		cpart->life = 680;
 	}
-
-	x = std::min(cpart->life, 680) * 624/(*colr+*colg+*colb+1) / 680;
-	*colr *= x;
-	*colg *= x;
-	*colb *= x;
 
 	*firea = 100 * std::min(cpart->life, 680) / 680;
 	*firer = *colr;
@@ -254,7 +236,7 @@ static int colourToWavelength(int cr, int cg, int cb, int &life)
 	mask |= ((1 << vg) - 1) << (12 + shg);
 	mask |= ((1 << vb) - 1);
 	mask &= 0x3FFFFFFF;
-	life = vl;
+	life = vl * 680 / 255;
 	if (life < 2)
 		life = 2;
 	return mask;
