@@ -174,7 +174,7 @@ static int graphics(GRAPHICS_FUNC_ARGS)
 		cpart->life = 680;
 	}
 
-	float lm = std::min(cpart->life, 680) / 680;
+	float lm = std::min(cpart->life, 680) / 680.0;
 	*colr *= lm;
 	*colg *= lm;
 	*colb *= lm;
