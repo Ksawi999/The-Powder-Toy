@@ -59,7 +59,7 @@ static int update(UPDATE_FUNC_ARGS)
 {
 	// process dcolour into ctype (or vice versa)
 	int cr, cg, cb, xl;
-	if (parts[i].dcolour != parts[i].tmp)
+	if (parts[i].dcolour != (unsigned int)parts[i].tmp)
 	{
 		xl = std::min(parts[i].life, 680) * 624/(cr+cg+cb+1) / 680;
 		cr = (parts[i].dcolour>>16)&0xFF;
@@ -155,11 +155,11 @@ static int graphics(GRAPHICS_FUNC_ARGS)
 			*colg += (cpart->ctype >> (xl+9))  & 1;
 			*colb += (cpart->ctype >>  xl)     & 1;
 		}
-		xl = 624/(cr+cg+cb+1);
+		xl = 624/(*colr+*colg+*colb+1);
 		*colr *= xl;
 		*colg *= xl;
 		*colb *= xl;
-		cpart->tmp = cpart->dcolour = 0xFF000000|(cr << 16)|(cg << 8)|cb;
+		cpart->tmp = cpart->dcolour = 0xFF000000|(*colr << 16)|(*colg << 8)|*colb;
 		cpart->tmp2 = cpart->ctype;
 	}
 	
