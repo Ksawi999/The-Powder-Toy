@@ -57,38 +57,29 @@ void Element::Element_PHOT()
 
 static int update(UPDATE_FUNC_ARGS)
 {
-	// process dcolour into ctype
+	// process dcolour into ctype (or vice versa)
+	int cr, cg, cb, x;
 	if (parts[i].dcolour != parts[i].tmp)
 	{
-		int cr, cg, cb, x;
-		for (x=0; x<12; x++) {
-			cr = (parts[i].ctype >> (x+18)) & 1;
-			cg = (parts[i].ctype >> (x+9))  & 1;
-			cb = (parts[i].ctype >>  x)     & 1;
-		}
 		x = std::min(parts[i].life, 680) * 624/(cr+cg+cb+1) / 680;
-		cr *= x;
-		cg *= x;
-		cb *= x;
-		int da = (parts[i].dcolour>>24)&0xFF;
-		int dr = (parts[i].dcolour>>16)&0xFF;
-		int dg = (parts[i].dcolour>>8)&0xFF;
-		int db = parts[i].dcolour&0xFF;
-		cr = (da*dr + (256-da)*cr) >> 8;
-		cg = (da*dg + (256-da)*cg) >> 8;
-		cb = (da*db + (256-da)*cb) >> 8;
+		cr = (parts[i].dcolour>>16)&0xFF;
+		cg = (parts[i].dcolour>>8)&0xFF;
+		cb = parts[i].dcolour&0xFF;
 		parts[i].ctype = colourToWavelength(cr, cg, cb, parts[i].life);
-		for (x=0; x<12; x++) {
-			cr = (parts[i].ctype >> (x+18)) & 1;
-			cg = (parts[i].ctype >> (x+9))  & 1;
-			cb = (parts[i].ctype >>  x)     & 1;
-		}
-		x = std::min(parts[i].life, 680) * 624/(cr+cg+cb+1) / 680;
-		cr *= x;
-		cg *= x;
-		cb *= x;
-		parts[i].tmp = parts[i].dcolour = 0xFF000000|(cr << 16)|(cg << 8)|cb;
+		parts[i].life -= (parts[i].dcolour>>24)&0xFF;
+		if (life < 2)
+			life = 2;
 	}
+	for (x=cr=cg=cb=0; x<12; x++) {
+		cr += (parts[i].ctype >> (x+18)) & 1;
+		cg += (parts[i].ctype >> (x+9))  & 1;
+		cb += (parts[i].ctype >>  x)     & 1;
+	}
+	x = 624/(cr+cg+cb+1);
+	cr *= x;
+	cg *= x;
+	cb *= x;
+	parts[i].tmp = parts[i].dcolour = 0xFF000000|(cr << 16)|(cg << 8)|cb;
 
 	int r, rx, ry;
 	float rr, rrr;
