@@ -66,20 +66,24 @@ static int update(UPDATE_FUNC_ARGS)
 		cg = (parts[i].dcolour>>8)&0xFF;
 		cb = parts[i].dcolour&0xFF;
 		parts[i].ctype = colourToWavelength(cr, cg, cb, parts[i].life);
-		parts[i].life -= (parts[i].dcolour>>24)&0xFF;
+		parts[i].life -= 0xFF-((parts[i].dcolour>>24)&0xFF);
 		if (parts[i].life < 2)
 			parts[i].life = 2;
 	}
-	for (xl=cr=cg=cb=0; xl<12; xl++) {
-		cr += (parts[i].ctype >> (xl+18)) & 1;
-		cg += (parts[i].ctype >> (xl+9))  & 1;
-		cb += (parts[i].ctype >>  xl)     & 1;
+	if (parts[i].ctype != parts[i].tmp2)
+	{
+		for (xl=cr=cg=cb=0; xl<12; xl++) {
+			cr += (parts[i].ctype >> (xl+18)) & 1;
+			cg += (parts[i].ctype >> (xl+9))  & 1;
+			cb += (parts[i].ctype >>  xl)     & 1;
+		}
+		xl = 624/(cr+cg+cb+1);
+		cr *= xl;
+		cg *= xl;
+		cb *= xl;
+		parts[i].tmp = parts[i].dcolour = 0xFF000000|(cr << 16)|(cg << 8)|cb;
+		parts[i].tmp2 = parts[i].ctype;
 	}
-	xl = 624/(cr+cg+cb+1);
-	cr *= xl;
-	cg *= xl;
-	cb *= xl;
-	parts[i].tmp = parts[i].dcolour = 0xFF000000|(cr << 16)|(cg << 8)|cb;
 
 	int r, rx, ry;
 	float rr, rrr;
@@ -143,6 +147,22 @@ static int update(UPDATE_FUNC_ARGS)
 
 static int graphics(GRAPHICS_FUNC_ARGS)
 {
+	if (cpart->ctype != cpart->tmp2)
+	{
+		int xl;
+		for (xl=*colr=*colg=*colb=0; xl<12; xl++) {
+			*colr += (cpart->ctype >> (xl+18)) & 1;
+			*colg += (cpart->ctype >> (xl+9))  & 1;
+			*colb += (cpart->ctype >>  xl)     & 1;
+		}
+		xl = 624/(cr+cg+cb+1);
+		*colr *= xl;
+		*colg *= xl;
+		*colb *= xl;
+		cpart->tmp = cpart->dcolour = 0xFF000000|(cr << 16)|(cg << 8)|cb;
+		cpart->tmp2 = cpart->ctype;
+	}
+	
 	*colr = (cpart->dcolour>>16)&0xFF;
 	*colg = (cpart->dcolour>>8)&0xFF;
 	*colb = cpart->dcolour&0xFF;
@@ -154,7 +174,11 @@ static int graphics(GRAPHICS_FUNC_ARGS)
 		cpart->life = 680;
 	}
 
-	*firea = 100 * std::min(cpart->life, 680) / 680;
+	float lm = std::min(cpart->life, 680) / 680;
+	*colr *= lm;
+	*colg *= lm;
+	*colb *= lm;
+	*firea = 100 * lm;
 	*firer = *colr;
 	*fireg = *colg;
 	*fireb = *colb;
