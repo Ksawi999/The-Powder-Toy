@@ -4,7 +4,7 @@ int Element_FIRE_update(UPDATE_FUNC_ARGS);
 static int update(UPDATE_FUNC_ARGS);
 static int graphics(GRAPHICS_FUNC_ARGS);
 static void create(ELEMENT_CREATE_FUNC_ARGS);
-static int colourToWavelength(int cr, int cg, int cb, int &life);
+static int colourToWavelength(int cr, int cg, int cb);
 
 void Element::Element_PHOT()
 {
@@ -61,12 +61,11 @@ static int update(UPDATE_FUNC_ARGS)
 	int cr, cg, cb, xl;
 	if (parts[i].dcolour != (unsigned int)parts[i].tmp)
 	{
-		xl = std::min(parts[i].life, 680) * 624/(cr+cg+cb+1) / 680;
 		cr = (parts[i].dcolour>>16)&0xFF;
 		cg = (parts[i].dcolour>>8)&0xFF;
 		cb = parts[i].dcolour&0xFF;
-		parts[i].ctype = colourToWavelength(cr, cg, cb, parts[i].life);
-		parts[i].life -= 0xFF-((parts[i].dcolour>>24)&0xFF);
+		parts[i].ctype = colourToWavelength(cr, cg, cb);
+		parts[i].life -= (0xFF-((parts[i].dcolour>>24)&0xFF)) * 680 / 255;
 		if (parts[i].life < 2)
 			parts[i].life = 2;
 		parts[i].dcolour = parts[i].tmp;
@@ -203,7 +202,7 @@ static void create(ELEMENT_CREATE_FUNC_ARGS)
 		sim->parts[i].ctype = Element_FILT_interactWavelengths(&sim->parts[ID(sim->pmap[y][x])], sim->parts[i].ctype);
 }
 
-static int colourToWavelength(int cr, int cg, int cb, int &life)
+static int colourToWavelength(int cr, int cg, int cb)
 {
 	float vl = std::max(std::max(cr, cg), cb);
 	if (vl == 0.0f)
@@ -249,8 +248,5 @@ static int colourToWavelength(int cr, int cg, int cb, int &life)
 	mask |= ((1 << vg) - 1) << (12 + shg);
 	mask |= ((1 << vb) - 1);
 	mask &= 0x3FFFFFFF;
-	life = vl * 680 / 255;
-	if (life < 2)
-		life = 2;
 	return mask;
 }
