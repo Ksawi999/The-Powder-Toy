@@ -59,7 +59,7 @@ static int update(UPDATE_FUNC_ARGS)
 {
 	// process dcolour into ctype (and vice versa)
 	int cr, cg, cb, xl;
-	if (parts[i].dcolour /*!= (unsigned int)parts[i].tmp*/)
+	if (parts[i].dcolour != (unsigned int)parts[i].tmp)
 	{
 		cr = (parts[i].dcolour>>16)&0xFF;
 		cg = (parts[i].dcolour>>8)&0xFF;
@@ -68,7 +68,7 @@ static int update(UPDATE_FUNC_ARGS)
 		parts[i].life -= (0xFF-((parts[i].dcolour>>24)&0xFF)) * 680 / 255;
 		if (parts[i].life < 2)
 			parts[i].life = 2;
-		//parts[i].dcolour = parts[i].tmp;
+		parts[i].dcolour = parts[i].tmp;
 	}
 	if (parts[i].ctype != parts[i].tmp2)
 	{
@@ -81,7 +81,7 @@ static int update(UPDATE_FUNC_ARGS)
 		cr *= xl;
 		cg *= xl;
 		cb *= xl;
-		/*parts[i].tmp =*/ parts[i].dcolour = 0xFF000000|(cr << 16)|(cg << 8)|cb;
+		parts[i].tmp = parts[i].dcolour = 0xFF000000|(cr << 16)|(cg << 8)|cb;
 		parts[i].tmp2 = parts[i].ctype;
 	}
 
@@ -159,7 +159,7 @@ static int graphics(GRAPHICS_FUNC_ARGS)
 		*colr *= xl;
 		*colg *= xl;
 		*colb *= xl;
-		/*cpart->tmp =*/ cpart->dcolour = 0xFF000000|(*colr << 16)|(*colg << 8)|*colb;
+		cpart->tmp = cpart->dcolour = 0xFF000000|(*colr << 16)|(*colg << 8)|*colb;
 		cpart->tmp2 = cpart->ctype;
 	}
 	
