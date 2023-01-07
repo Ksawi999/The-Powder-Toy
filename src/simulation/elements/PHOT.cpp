@@ -57,7 +57,7 @@ void Element::Element_PHOT()
 
 static int update(UPDATE_FUNC_ARGS)
 {
-	// process dcolour into ctype (or vice versa)
+	// process dcolour into ctype (and vice versa)
 	int cr, cg, cb, xl;
 	if (parts[i].dcolour != (unsigned int)parts[i].tmp)
 	{
@@ -69,6 +69,7 @@ static int update(UPDATE_FUNC_ARGS)
 		parts[i].life -= 0xFF-((parts[i].dcolour>>24)&0xFF);
 		if (parts[i].life < 2)
 			parts[i].life = 2;
+		parts[i].dcolour = parts[i].tmp;
 	}
 	if (parts[i].ctype != parts[i].tmp2)
 	{
@@ -163,9 +164,9 @@ static int graphics(GRAPHICS_FUNC_ARGS)
 		cpart->tmp2 = cpart->ctype;
 	}
 	
-	*colr = (cpart->dcolour>>16)&0xFF;
-	*colg = (cpart->dcolour>>8)&0xFF;
-	*colb = cpart->dcolour&0xFF;
+	*firer = *colr = (cpart->dcolour>>16)&0xFF;
+	*fireg = *colg = (cpart->dcolour>>8)&0xFF;
+	*fireb = *colb = cpart->dcolour&0xFF;
 
 	bool tozero = false;
 	if (cpart->life <= 0)
@@ -174,14 +175,11 @@ static int graphics(GRAPHICS_FUNC_ARGS)
 		cpart->life = 680;
 	}
 
-	float lm = std::min(cpart->life, 680) / 680.0;
-	*colr *= lm;
-	*colg *= lm;
-	*colb *= lm;
-	*firea = 100 * lm;
-	*firer = *colr;
-	*fireg = *colg;
-	*fireb = *colb;
+	double lm = std::min(cpart->life, 680) / 680.0;
+	*colr = round(*colr * lm);
+	*colg = round(*colg * lm);
+	*colb = round(*colb * lm);
+	*firea = round(100.0 * lm);
 
 	if (tozero)
 		cpart->life = 0;
