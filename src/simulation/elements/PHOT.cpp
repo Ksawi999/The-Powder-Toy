@@ -58,7 +58,7 @@ void Element::Element_PHOT()
 static int update(UPDATE_FUNC_ARGS)
 {
 	// process dcolour into ctype (and vice versa)
-	int cr, cg, cb, xl;
+	int cr, cg, cb;
 	if (parts[i].dcolour != (unsigned int)parts[i].tmp)
 	{
 		cr = (parts[i].dcolour>>16)&0xFF;
@@ -72,15 +72,16 @@ static int update(UPDATE_FUNC_ARGS)
 	}
 	if (parts[i].ctype != parts[i].tmp2)
 	{
-		for (xl=cr=cg=cb=0; xl<12; xl++) {
-			cr += (parts[i].ctype >> (xl+18)) & 1;
-			cg += (parts[i].ctype >> (xl+9))  & 1;
-			cb += (parts[i].ctype >>  xl)     & 1;
+		int xi;
+		for (xi=cr=cg=cb=0; xl<12; xl++) {
+			cr += (parts[i].ctype >> (xi+18)) & 1;
+			cg += (parts[i].ctype >> (xi+9))  & 1;
+			cb += (parts[i].ctype >>  xi)     & 1;
 		}
-		xl = 624/(cr+cg+cb+1);
-		cr *= xl;
-		cg *= xl;
-		cb *= xl;
+		double xl = 255.0 / std::max(std:max(cr,cg),cb);
+		cr = round(cr * xl);
+		cg = round(cg * xl);
+		cb = round(cb * xl);
 		parts[i].tmp = parts[i].dcolour = 0xFF000000|(cr << 16)|(cg << 8)|cb;
 		parts[i].tmp2 = parts[i].ctype;
 	}
@@ -149,16 +150,16 @@ static int graphics(GRAPHICS_FUNC_ARGS)
 {
 	if (cpart->ctype != cpart->tmp2)
 	{
-		int xl;
-		for (xl=*colr=*colg=*colb=0; xl<12; xl++) {
-			*colr += (cpart->ctype >> (xl+18)) & 1;
-			*colg += (cpart->ctype >> (xl+9))  & 1;
-			*colb += (cpart->ctype >>  xl)     & 1;
+		int x;
+		for (x=*colr=*colg=*colb=0; x<12; x++) {
+			*colr += (cpart->ctype >> (x+18)) & 1;
+			*colg += (cpart->ctype >> (x+9))  & 1;
+			*colb += (cpart->ctype >>  x)     & 1;
 		}
-		xl = 624/(*colr+*colg+*colb+1);
-		*colr *= xl;
-		*colg *= xl;
-		*colb *= xl;
+		double xl = 255.0 / std::max(std:max(*colr,*colg),*colb);
+		*colr = round(*colr * xl);
+		*colg = round(*colg * xl);
+		*colb = round(*colb * xl);
 		cpart->tmp = cpart->dcolour = 0xFF000000|(*colr << 16)|(*colg << 8)|*colb;
 		cpart->tmp2 = cpart->ctype;
 	}
