@@ -4342,11 +4342,17 @@ killed:
 					if (t == PT_PHOT)
 					{
 						unsigned int mask = 0;
-						if (TYP(r) != PT_LITH && elements[TYP(r)].MenuSection != SC_SPECIAL && elements[TYP(r)].MenuSection > SC_FORCE)
+						if (TYP(r) != PT_LITH && ((elements[TYP(r)].MenuSection != SC_SPECIAL && elements[TYP(r)].MenuSection > SC_FORCE) || (elements[TYP(r)].Properties & PROP_CONDUCTS) || TYP(r) == PT_SPRK))
 						{
 							int cr = PIXR(elements[TYP(r)].Colour);
 							int cg = PIXG(elements[TYP(r)].Colour);
 							int cb = PIXB(elements[TYP(r)].Colour);
+							if(TYP(r) == PT_SPRK)
+							{
+								cr = PIXR(elements[parts[ID(r)].ctype].Colour);
+								cg = PIXG(elements[parts[ID(r)].ctype].Colour);
+								cb = PIXB(elements[parts[ID(r)].ctype].Colour);
+							}
 							if(parts[ID(r)].dcolour)
 							{
 								int da = (parts[ID(r)].dcolour>>24)&0xFF;
