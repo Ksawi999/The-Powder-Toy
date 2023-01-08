@@ -65,6 +65,7 @@ static int update(UPDATE_FUNC_ARGS)
 		cg = (parts[i].dcolour>>8)&0xFF;
 		cb = parts[i].dcolour&0xFF;
 		parts[i].ctype = colourToWavelength(cr, cg, cb);
+		parts[i].life = std::max(std::max(cr, cg), cb) * 680 / 255;
 		parts[i].life -= (0xFF-((parts[i].dcolour>>24)&0xFF)) * 680 / 255;
 		if (parts[i].life < 2)
 			parts[i].life = 2;
@@ -164,9 +165,9 @@ static int graphics(GRAPHICS_FUNC_ARGS)
 		cpart->tmp2 = cpart->ctype;
 	}
 	
-	*firer = *colr = (cpart->dcolour>>16)&0xFF;
-	*fireg = *colg = (cpart->dcolour>>8)&0xFF;
-	*fireb = *colb = cpart->dcolour&0xFF;
+	*colr = (cpart->dcolour>>16)&0xFF;
+	*colg = (cpart->dcolour>>8)&0xFF;
+	*colb = cpart->dcolour&0xFF;
 
 	bool tozero = false;
 	if (cpart->life <= 0)
@@ -176,9 +177,9 @@ static int graphics(GRAPHICS_FUNC_ARGS)
 	}
 
 	double lm = std::min(cpart->life, 680) / 680.0;
-	*colr = round(*colr * lm);
-	*colg = round(*colg * lm);
-	*colb = round(*colb * lm);
+	*firer = *colr = round(*colr * lm);
+	*fireg = *colg = round(*colg * lm);
+	*fireb = *colb = round(*colb * lm);
 	*firea = round(100.0 * lm);
 
 	if (tozero)
