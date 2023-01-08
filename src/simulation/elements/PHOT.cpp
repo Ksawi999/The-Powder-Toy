@@ -73,12 +73,12 @@ static int update(UPDATE_FUNC_ARGS)
 	if (parts[i].ctype != parts[i].tmp2)
 	{
 		int xi;
-		for (xi=cr=cg=cb=0; xl<12; xl++) {
+		for (xi=cr=cg=cb=0; xi<12; xi++) {
 			cr += (parts[i].ctype >> (xi+18)) & 1;
 			cg += (parts[i].ctype >> (xi+9))  & 1;
 			cb += (parts[i].ctype >>  xi)     & 1;
 		}
-		double xl = 255.0 / std::max(std:max(cr,cg),cb);
+		double xl = 255.0 / std::max(std::max(cr,cg),cb);
 		cr = round(cr * xl);
 		cg = round(cg * xl);
 		cb = round(cb * xl);
@@ -156,7 +156,7 @@ static int graphics(GRAPHICS_FUNC_ARGS)
 			*colg += (cpart->ctype >> (x+9))  & 1;
 			*colb += (cpart->ctype >>  x)     & 1;
 		}
-		double xl = 255.0 / std::max(std:max(*colr,*colg),*colb);
+		double xl = 255.0 / std::max(std::max(*colr,*colg),*colb);
 		*colr = round(*colr * xl);
 		*colg = round(*colg * xl);
 		*colb = round(*colb * xl);
