@@ -2550,6 +2550,7 @@ int Simulation::eval_move(int pt, int nx, int ny, unsigned *rr)
 		case PT_BIZRG:
 		case PT_BIZRS:
 			result = (parts[ID(r)].tmp != 2) ? 2 : 0;
+			break;
 		default:
 			// This should never happen
 			// If it were to happen, try_move would interpret a 3 as a 1
