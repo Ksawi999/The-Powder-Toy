@@ -2454,12 +2454,12 @@ void Simulation::init_can_move()
 	can_move[PT_PHOT][PT_LCRY] = 3; //varies according to LCRY life
 	can_move[PT_PHOT][PT_GPMP] = 3;
 
-	can_move[PT_PHOT][PT_BIZR] = 2;
-	can_move[PT_ELEC][PT_BIZR] = 2;
-	can_move[PT_PHOT][PT_BIZRG] = 2;
-	can_move[PT_ELEC][PT_BIZRG] = 2;
-	can_move[PT_PHOT][PT_BIZRS] = 2;
-	can_move[PT_ELEC][PT_BIZRS] = 2;
+	can_move[PT_PHOT][PT_BIZR] = 3;
+	can_move[PT_ELEC][PT_BIZR] = 3;
+	can_move[PT_PHOT][PT_BIZRG] = 3;
+	can_move[PT_ELEC][PT_BIZRG] = 3;
+	can_move[PT_PHOT][PT_BIZRS] = 3;
+	can_move[PT_ELEC][PT_BIZRS] = 3;
 	can_move[PT_BIZR][PT_FILT] = 2;
 	can_move[PT_BIZRG][PT_FILT] = 2;
 
@@ -2501,7 +2501,7 @@ int Simulation::eval_move(int pt, int nx, int ny, unsigned *rr)
 		{
 		case PT_LCRY:
 			if (pt==PT_PHOT)
-				result = (parts[ID(r)].life > 5)? 2 : 0;
+				result = (parts[ID(r)].life > 5) ? 2 : 0;
 			break;
 		case PT_GPMP:
 			if (pt == PT_PHOT)
@@ -2546,6 +2546,10 @@ int Simulation::eval_move(int pt, int nx, int ny, unsigned *rr)
 					return 0;
 			}
 			break;
+		case PT_BIZR:
+		case PT_BIZRG:
+		case PT_BIZRS:
+			result = (parts[ID(r)].tmp != 2) ? 2 : 0;
 		default:
 			// This should never happen
 			// If it were to happen, try_move would interpret a 3 as a 1
