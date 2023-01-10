@@ -4350,7 +4350,7 @@ killed:
 					if (t == PT_PHOT)
 					{
 						unsigned int mask = 0;
-						if (TYP(r) != PT_LITH && ((elements[TYP(r)].MenuSection != SC_SPECIAL && elements[TYP(r)].MenuSection > SC_FORCE) || (elements[TYP(r)].Properties & PROP_CONDUCTS) || TYP(r) == PT_SPRK))
+						if (TYP(r) != PT_LITH && ((elements[TYP(r)].MenuSection != SC_SPECIAL && elements[TYP(r)].MenuSection > SC_FORCE) || (elements[TYP(r)].Properties & PROP_CONDUCTS) || TYP(r) == PT_SPRK) && (!(TYP(r) == PT_BRAY || TYP(r) == PT_BIZR || TYP(r) == PT_BIZG || TYP(r) == PT_BIZS) || parts[ID(r)].dcolour))
 						{
 							int cr = PIXR(elements[TYP(r)].Colour);
 							int cg = PIXG(elements[TYP(r)].Colour);
@@ -4437,6 +4437,8 @@ killed:
 							mask = (0x1F << wl_bin);
 							parts[i].ctype &= mask;
 						}
+						else if ((TYP(r) == PT_BRAY || TYP(r) == PT_BIZR || TYP(r) == PT_BIZG || TYP(r) == PT_BIZS) && !parts[ID(r)].dcolour)
+							parts[i].ctype &= parts[ID(r)].ctype;
 					}
 
 					if (get_normal_interp(t, parts[i].x, parts[i].y, parts[i].vx, parts[i].vy, &nrx, &nry))
