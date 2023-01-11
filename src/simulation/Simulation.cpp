@@ -1218,7 +1218,7 @@ void Simulation::ApplyDecoration(int x, int y, int colR_, int colG_, int colB_, 
 		parts[ID(rp)].dcolour = ((colA_<<24)|(colR_<<16)|(colG_<<8)|colB_);
 	else
 	{
-		int cr = &colR_, cg = &colG_, cb = &colB_;
+		int cr = colR_, cg = colG_, cb = colB_;
 		float vl = std::max(std::max(cr, cg), cb);
 		if (vl == 0.0f)
 			vl = 1.0f;
