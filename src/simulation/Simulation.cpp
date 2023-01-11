@@ -1029,10 +1029,38 @@ void Simulation::ApplyDecoration(int x, int y, int colR_, int colG_, int colB_, 
 	if (!rp)
 		return;
 
-	ta = float((parts[ID(rp)].dcolour>>24)&0xFF);
-	tr = float((parts[ID(rp)].dcolour>>16)&0xFF);
-	tg = float((parts[ID(rp)].dcolour>>8)&0xFF);
-	tb = float((parts[ID(rp)].dcolour)&0xFF);
+	if (TYP(rp) == PT_PHOT)
+	{
+		ta = 255;
+		tr = tg = tb = 0;
+		for (int x=0; x<12; x++) {
+			tr += (parts[ID(rp)].ctype >> (x+18)) & 1;
+			tg += (parts[ID(rp)].ctype >> (x+9))  & 1;
+			tb += (parts[ID(rp)].ctype >>  x)     & 1;
+		}
+
+		bool tozero = false;
+		if (parts[ID(rp)].life <= 0)
+		{
+			tozero = true;
+			parts[ID(rp)].life = 680;
+		}
+
+		double xl = 255.0 / std::max(std::max(tr,tg),tb) * std::min(parts[ID(rp)].life, 680) / 680.0;
+		tr = round(tr * xl);
+		tg = round(tg * xl);
+		tb = round(tb * xl);
+
+		if (tozero)
+			parts[ID(rp)].life = 0;
+	}
+	else
+	{
+		ta = float((parts[ID(rp)].dcolour>>24)&0xFF);
+		tr = float((parts[ID(rp)].dcolour>>16)&0xFF);
+		tg = float((parts[ID(rp)].dcolour>>8)&0xFF);
+		tb = float((parts[ID(rp)].dcolour)&0xFF);
+	}
 
 	ta /= 255.0f; tr /= 255.0f; tg /= 255.0f; tb /= 255.0f;
 	colR /= 255.0f; colG /= 255.0f; colB /= 255.0f; colA /= 255.0f;
@@ -1186,7 +1214,12 @@ void Simulation::ApplyDecoration(int x, int y, int colR_, int colG_, int colB_, 
 		colB_ = 255;
 	else if(colB_ < 0)
 		colB_ = 0;
-	parts[ID(rp)].dcolour = ((colA_<<24)|(colR_<<16)|(colG_<<8)|colB_);
+	if (TYP(rp) != PT_PHOT)
+		parts[ID(rp)].dcolour = ((colA_<<24)|(colR_<<16)|(colG_<<8)|colB_);
+	else
+	{
+		// enter function here
+	}
 }
 
 void Simulation::ApplyDecorationPoint(int positionX, int positionY, int colR, int colG, int colB, int colA, int mode, Brush * cBrush)
