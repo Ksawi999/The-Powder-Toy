@@ -90,7 +90,14 @@ static int update(UPDATE_FUNC_ARGS)
 						if(parts[i].tmp2 < 2)
 							sim->create_part(ID(r), x+rx, y+ry, TYP(parts[i].ctype), ID(parts[i].ctype));
 						else
+						{
+							part[ID(r)].tmp = sim->elements[ctype].DefaultProperties.tmp;
+							part[ID(r)].tmp2 = sim->elements[ctype].DefaultProperties.tmp2;
+							part[ID(r)].tmp3 = sim->elements[ctype].DefaultProperties.tmp3;
+							part[ID(r)].tmp4 = sim->elements[ctype].DefaultProperties.tmp4;
+							part[ID(r)].flags = sim->elements[ctype].DefaultProperties.flags;
 							sim->part_change_type(ID(r), x+rx, y+ry, TYP(parts[i].ctype));
+						}
 					}
 				}
 	}
