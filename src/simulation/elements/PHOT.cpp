@@ -4,7 +4,6 @@ int Element_FIRE_update(UPDATE_FUNC_ARGS);
 static int update(UPDATE_FUNC_ARGS);
 static int graphics(GRAPHICS_FUNC_ARGS);
 static void create(ELEMENT_CREATE_FUNC_ARGS);
-static int colourToWavelength(int cr, int cg, int cb);
 
 void Element::Element_PHOT()
 {
@@ -57,36 +56,6 @@ void Element::Element_PHOT()
 
 static int update(UPDATE_FUNC_ARGS)
 {
-	// process dcolour into ctype (and vice versa)
-	int cr, cg, cb;
-	if (parts[i].dcolour != (unsigned int)parts[i].tmp)
-	{
-		cr = (parts[i].dcolour>>16)&0xFF;
-		cg = (parts[i].dcolour>>8)&0xFF;
-		cb = parts[i].dcolour&0xFF;
-		parts[i].ctype = colourToWavelength(cr, cg, cb);
-		parts[i].life = std::max(std::max(cr, cg), cb) * 680 / 255;
-		parts[i].life -= (0xFF-((parts[i].dcolour>>24)&0xFF)) * 680 / 255;
-		if (parts[i].life < 2)
-			parts[i].life = 2;
-		parts[i].dcolour = parts[i].tmp;
-	}
-	if (parts[i].ctype != parts[i].tmp2)
-	{
-		int xi;
-		for (xi=cr=cg=cb=0; xi<12; xi++) {
-			cr += (parts[i].ctype >> (xi+18)) & 1;
-			cg += (parts[i].ctype >> (xi+9))  & 1;
-			cb += (parts[i].ctype >>  xi)     & 1;
-		}
-		double xl = 255.0 / std::max(std::max(cr,cg),cb);
-		cr = round(cr * xl);
-		cg = round(cg * xl);
-		cb = round(cb * xl);
-		parts[i].tmp = parts[i].dcolour = 0xFF000000|(cr << 16)|(cg << 8)|cb;
-		parts[i].tmp2 = parts[i].ctype;
-	}
-
 	int r, rx, ry;
 	float rr, rrr;
 	if (!(parts[i].ctype&0x3FFFFFFF)) {
@@ -149,26 +118,13 @@ static int update(UPDATE_FUNC_ARGS)
 
 static int graphics(GRAPHICS_FUNC_ARGS)
 {
-	if (cpart->ctype != cpart->tmp2)
-	{
-		int x;
-		for (x=*colr=*colg=*colb=0; x<12; x++) {
-			*colr += (cpart->ctype >> (x+18)) & 1;
-			*colg += (cpart->ctype >> (x+9))  & 1;
-			*colb += (cpart->ctype >>  x)     & 1;
-		}
-		double xl = 255.0 / std::max(std::max(*colr,*colg),*colb);
-		*colr = round(*colr * xl);
-		*colg = round(*colg * xl);
-		*colb = round(*colb * xl);
-		cpart->tmp = cpart->dcolour = 0xFF000000|(*colr << 16)|(*colg << 8)|*colb;
-		cpart->tmp2 = cpart->ctype;
+	int x;
+	for (x=*colr=*colg=*colb=0; x<12; x++) {
+		*colr += (cpart->ctype >> (x+18)) & 1;
+		*colg += (cpart->ctype >> (x+9))  & 1;
+		*colb += (cpart->ctype >>  x)     & 1;
 	}
 	
-	*colr = (cpart->dcolour>>16)&0xFF;
-	*colg = (cpart->dcolour>>8)&0xFF;
-	*colb = cpart->dcolour&0xFF;
-
 	bool tozero = false;
 	if (cpart->life <= 0)
 	{
@@ -177,9 +133,10 @@ static int graphics(GRAPHICS_FUNC_ARGS)
 	}
 
 	double lm = std::min(cpart->life, 680) / 680.0;
-	*firer = *colr = round(*colr * lm);
-	*fireg = *colg = round(*colg * lm);
-	*fireb = *colb = round(*colb * lm);
+	double xl = 255.0 / std::max(std::max(*colr,*colg),*colb) * lm;
+	*firer = *colr = round(*colr * xl);
+	*fireg = *colg = round(*colg * xl);
+	*fireb = *colb = round(*colb * xl);
 	*firea = round(100.0 * lm);
 
 	if (tozero)
@@ -202,53 +159,4 @@ static void create(ELEMENT_CREATE_FUNC_ARGS)
 	int Element_FILT_interactWavelengths(Particle* cpart, int origWl);
 	if (TYP(sim->pmap[y][x]) == PT_FILT)
 		sim->parts[i].ctype = Element_FILT_interactWavelengths(&sim->parts[ID(sim->pmap[y][x])], sim->parts[i].ctype);
-}
-
-static int colourToWavelength(int cr, int cg, int cb)
-{
-	float vl = std::max(std::max(cr, cg), cb);
-	if (vl == 0.0f)
-		vl = 1.0f;
-	int mt = 5;
-	int best = 1000;
-	int bestmt = mt;
-	int vr, vg, vb;
-	for (; mt < 13; mt++)
-	{
-		vr = (int)(cr / vl * mt + 0.5f);
-		vg = (int)(cg / vl * mt + 0.5f);
-		vb = (int)(cb / vl * mt + 0.5f);
-		if ((mt < 7 || vr + vb >= mt - 6) && (mt < 10 || vg >= std::max(vr - 9, 0) + std::max(vb - 9, 0)))
-		{
-			int diff = std::abs(cr - vr * vl / mt) + std::abs(cg - vg * vl / mt) + std::abs(cb - vb * vl / mt);
-			if (diff <= best)
-			{
-				best = diff;
-				bestmt = mt;
-			}
-		}
-	}
-	mt = bestmt;
-	vr = (int)(cr / vl * mt + 0.5f);
-	vg = (int)(cg / vl * mt + 0.5f);
-	vb = (int)(cb / vl * mt + 0.5f);
-	int shg = 0;
-	if (vg > 6)
-	{
-		shg = std::min(std::max(std::max(std::min(vr - vb, vg - 6), 6 - vg), -3), 3);
-		vr -= std::max(shg, 0);
-		vb += std::min(shg, 0);
-	}
-	else
-	{
-		if (vb > 9)
-			vg -= vb - 9;
-		if (vr > 9)
-			vg -= vr - 9;
-	}
-	unsigned int mask = ((1 << vr) - 1) << (30 - vr);
-	mask |= ((1 << vg) - 1) << (12 + shg);
-	mask |= ((1 << vb) - 1);
-	mask &= 0x3FFFFFFF;
-	return mask;
 }

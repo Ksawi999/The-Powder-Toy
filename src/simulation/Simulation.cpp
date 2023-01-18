@@ -1029,10 +1029,38 @@ void Simulation::ApplyDecoration(int x, int y, int colR_, int colG_, int colB_, 
 	if (!rp)
 		return;
 
-	ta = float((parts[ID(rp)].dcolour>>24)&0xFF);
-	tr = float((parts[ID(rp)].dcolour>>16)&0xFF);
-	tg = float((parts[ID(rp)].dcolour>>8)&0xFF);
-	tb = float((parts[ID(rp)].dcolour)&0xFF);
+	if (TYP(rp) == PT_PHOT)
+	{
+		ta = 255;
+		tr = tg = tb = 0;
+		for (int x=0; x<12; x++) {
+			tr += (parts[ID(rp)].ctype >> (x+18)) & 1;
+			tg += (parts[ID(rp)].ctype >> (x+9))  & 1;
+			tb += (parts[ID(rp)].ctype >>  x)     & 1;
+		}
+
+		bool tozero = false;
+		if (parts[ID(rp)].life <= 0)
+		{
+			tozero = true;
+			parts[ID(rp)].life = 680;
+		}
+
+		double xl = 255.0 / std::max(std::max(tr,tg),tb) * std::min(parts[ID(rp)].life, 680) / 680.0;
+		tr = round(tr * xl);
+		tg = round(tg * xl);
+		tb = round(tb * xl);
+
+		if (tozero)
+			parts[ID(rp)].life = 0;
+	}
+	else
+	{
+		ta = float((parts[ID(rp)].dcolour>>24)&0xFF);
+		tr = float((parts[ID(rp)].dcolour>>16)&0xFF);
+		tg = float((parts[ID(rp)].dcolour>>8)&0xFF);
+		tb = float((parts[ID(rp)].dcolour)&0xFF);
+	}
 
 	ta /= 255.0f; tr /= 255.0f; tg /= 255.0f; tb /= 255.0f;
 	colR /= 255.0f; colG /= 255.0f; colB /= 255.0f; colA /= 255.0f;
@@ -1186,7 +1214,57 @@ void Simulation::ApplyDecoration(int x, int y, int colR_, int colG_, int colB_, 
 		colB_ = 255;
 	else if(colB_ < 0)
 		colB_ = 0;
-	parts[ID(rp)].dcolour = ((colA_<<24)|(colR_<<16)|(colG_<<8)|colB_);
+	if (TYP(rp) != PT_PHOT)
+		parts[ID(rp)].dcolour = ((colA_<<24)|(colR_<<16)|(colG_<<8)|colB_);
+	else
+	{
+		int cr = colR_, cg = colG_, cb = colB_;
+		float vl = std::max(std::max(cr, cg), cb);
+		if (vl == 0.0f)
+			vl = 1.0f;
+		int mt = 5;
+		int best = 1000;
+		int bestmt = mt;
+		int vr, vg, vb;
+		for (; mt < 13; mt++)
+		{
+			vr = (int)(cr / vl * mt + 0.5f);
+			vg = (int)(cg / vl * mt + 0.5f);
+			vb = (int)(cb / vl * mt + 0.5f);
+			if ((mt < 7 || vr + vb >= mt - 6) && (mt < 10 || vg >= std::max(vr - 9, 0) + std::max(vb - 9, 0)))
+			{
+				int diff = std::abs(cr - vr * vl / mt) + std::abs(cg - vg * vl / mt) + std::abs(cb - vb * vl / mt);
+				if (diff <= best)
+				{
+					best = diff;
+					bestmt = mt;
+				}
+			}
+		}
+		mt = bestmt;
+		vr = (int)(cr / vl * mt + 0.5f);
+		vg = (int)(cg / vl * mt + 0.5f);
+		vb = (int)(cb / vl * mt + 0.5f);
+		int shg = 0;
+		if (vg > 6)
+		{
+			shg = std::min(std::max(std::max(std::min(vr - vb, vg - 6), 6 - vg), -3), 3);
+			vr -= std::max(shg, 0);
+			vb += std::min(shg, 0);
+		}
+		else
+		{
+			if (vb > 9)
+				vg -= vb - 9;
+			if (vr > 9)
+				vg -= vr - 9;
+		}
+		unsigned int mask = ((1 << vr) - 1) << (30 - vr);
+		mask |= ((1 << vg) - 1) << (12 + shg);
+		mask |= ((1 << vb) - 1);
+		mask &= 0x3FFFFFFF;
+		parts[ID(rp)].ctype = mask;
+	}
 }
 
 void Simulation::ApplyDecorationPoint(int positionX, int positionY, int colR, int colG, int colB, int colA, int mode, Brush * cBrush)
