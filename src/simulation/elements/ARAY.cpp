@@ -163,8 +163,12 @@ static int update(UPDATE_FUNC_ARGS)
 								{
 									parts[r].life = 10;
 								}
-							// this if prevents BRAY from stopping on certain materials
 							}
+							else if (rt == PT_LITH)
+							{
+								parts[r].ctype += colored;
+							}
+							// this if prevents BRAY from stopping on certain materials
 							else if (rt != PT_INWR && (rt != PT_SPRK || parts[r].ctype != PT_INWR) && rt != PT_ARAY && rt != PT_WIFI && !(rt == PT_SWCH && parts[r].life >= 10))
 							{
 								if (nyy!=0 || nxx!=0)
