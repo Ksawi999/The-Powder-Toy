@@ -1248,9 +1248,9 @@ void Simulation::ApplyDecoration(int x, int y, int colR_, int colG_, int colB_, 
 		int shg = 0;
 		if (vg > 6)
 		{
-			shg = std::min(std::max(std::min(std::max(std::min(std::max(std::max(std::min(vr - vb, vg - 6), 6 - vg), -3), 3), 0 - vb), vr), vr - 12), vb - 9);
-			vr -= std::max(shg, 0);
-			vb += std::min(shg, 0);
+			shg = std::min(std::max(std::max(vb - 9, vg - 6 - vr), 0), 3);
+			vr -= gv - 6 - shg;
+			vb -= shg;
 		}
 		else
 		{
@@ -1260,7 +1260,7 @@ void Simulation::ApplyDecoration(int x, int y, int colR_, int colG_, int colB_, 
 				vg -= vr - 9;
 		}
 		unsigned int mask = ((1 << vr) - 1) << (30 - vr);
-		mask |= ((1 << vg) - 1) << (12 + shg);
+		mask |= ((1 << vg) - 1) << (12 - shg);
 		mask |= ((1 << vb) - 1);
 		mask &= 0x3FFFFFFF;
 		parts[ID(rp)].ctype = mask;
