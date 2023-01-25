@@ -142,7 +142,7 @@ static int update(UPDATE_FUNC_ARGS)
 								if(nostop)
 								{
 									docontinue = 1;
-									colored = 0x3FFFFFFF >> (30 - std::min(std::max(parts[r].ctype / 4, 0), 30));
+									colored = (0x3FFFFFFF >> (30 - std::min(std::max(parts[r].ctype / 4, 0), 30))) ^ 2;
 								}
 								else
 									docontinue = 0;
