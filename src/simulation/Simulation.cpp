@@ -1249,7 +1249,7 @@ void Simulation::ApplyDecoration(int x, int y, int colR_, int colG_, int colB_, 
 		if (vg > 6)
 		{
 			shg = std::min(std::max(std::max(vb - 9, vg - 6 - vr), 0), 3);
-			vr -= gv - 6 - shg;
+			vr -= vg - 6 - shg;
 			vb -= shg;
 		}
 		else
