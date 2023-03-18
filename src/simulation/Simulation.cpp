@@ -1223,7 +1223,7 @@ void Simulation::ApplyDecoration(int x, int y, int colR_, int colG_, int colB_, 
 		if (vl == 0.0f)
 			vl = 1.0f;
 		int mt = 5;
-		int best = 1000;
+		int best = 1000000;
 		int bestmt = mt;
 		int vr, vg, vb;
 		for (; mt < 13; mt++)
@@ -1233,7 +1233,7 @@ void Simulation::ApplyDecoration(int x, int y, int colR_, int colG_, int colB_, 
 			vb = (int)(cb / vl * mt + 0.5f);
 			if ((mt < 7 || vr + vb >= mt - 6) && (mt < 10 || vg >= std::max(vr - 9, 0) + std::max(vb - 9, 0)))
 			{
-				int diff = std::abs(cr - vr * vl / mt) + std::abs(cg - vg * vl / mt) + std::abs(cb - vb * vl / mt);
+				int diff = pow(cr - vr * vl / mt, 2) + pow(cg - vg * vl / mt, 2) + pow(cb - vb * vl / mt, 2);
 				if (diff <= best)
 				{
 					best = diff;
@@ -1246,18 +1246,24 @@ void Simulation::ApplyDecoration(int x, int y, int colR_, int colG_, int colB_, 
 		vg = (int)(cg / vl * mt + 0.5f);
 		vb = (int)(cb / vl * mt + 0.5f);
 		int shg = 0;
-		if (vg > 6)
+		if (vb > 9 && vr > 9 && vr > vg && vb > vg)
+			vg -= vb + vr - 18;
+		else if (vb > 9 && vb > vg)
 		{
-			shg = std::min(std::max(std::max(vb - 9, vg - 6 - vr), 0), 3);
-			vr -= vg - 6 - shg;
+			vg -= vb - 9;
+			vr -= std::max(vg - 6, 0);
+		}
+		else if (vr > 9 && vr > vg)
+		{
+			vg -= vr - 9;
+			shg = std::max(vg - 6, 0);
 			vb -= shg;
 		}
-		else
+		else if (vg > 6)
 		{
-			if (vb > 9)
-				vg -= vb - 9;
-			if (vr > 9)
-				vg -= vr - 9;
+			shg = std::min(std::max(vg - 6 - vr, std::max(0, vg - 9)), 3);
+			vr -= vg - 6 - shg;
+			vb -= shg;
 		}
 		unsigned int mask = ((1 << vr) - 1) << (30 - vr);
 		mask |= ((1 << vg) - 1) << (12 - shg);
