@@ -12,7 +12,7 @@ void Element::Element_TRON()
 {
 	Identifier = "DEFAULT_PT_TRON";
 	Name = "TRON";
-	Colour = PIXPACK(0xA9FF00);
+	Colour = 0xA9FF00_rgb;
 	MenuVisible = 1;
 	MenuSection = SC_SPECIAL;
 	Enabled = 1;
@@ -74,12 +74,12 @@ void Element::Element_TRON()
  * .ctype Contains the colour, lost on save, regenerated using hue tmp (bits 7 - 16)
  */
 
-#define TRON_HEAD 1
-#define TRON_NOGROW 2
-#define TRON_WAIT 4 //it was just created, so WAIT a frame
-#define TRON_NODIE 8
-#define TRON_DEATH 16 //Crashed, now dying
-#define TRON_NORANDOM 65536
+constexpr auto TRON_HEAD     = UINT32_C(0x00000001);
+constexpr auto TRON_NOGROW   = UINT32_C(0x00000002);
+constexpr auto TRON_WAIT     = UINT32_C(0x00000004); //it was just created, so WAIT a frame
+constexpr auto TRON_NODIE    = UINT32_C(0x00000008);
+constexpr auto TRON_DEATH    = UINT32_C(0x00000010); //Crashed, now dying
+constexpr auto TRON_NORANDOM = UINT32_C(0x00010000);
 int tron_rx[4] = {-1, 0, 1, 0};
 int tron_ry[4] = { 0,-1, 0, 1};
 unsigned int tron_colours[32];
@@ -109,7 +109,7 @@ static int update(UPDATE_FUNC_ARGS)
 		int originaldir = direction;
 
 		//random turn
-		int random = RNG::Ref().between(0, 339);
+		int random = sim->rng.between(0, 339);
 		if ((random==1 || random==3) && !(parts[i].tmp & TRON_NORANDOM))
 		{
 			//randomly turn left(3) or right(1)
@@ -133,7 +133,7 @@ static int update(UPDATE_FUNC_ARGS)
 			}
 			else
 			{
-				seconddir = (direction + (RNG::Ref().between(0, 1)*2)+1)% 4;
+				seconddir = (direction + (sim->rng.between(0, 1)*2)+1)% 4;
 				lastdir = (seconddir + 2)%4;
 			}
 			seconddircheck = trymovetron(sim,x,y,seconddir,i,parts[i].tmp2);
@@ -192,8 +192,8 @@ static int graphics(GRAPHICS_FUNC_ARGS)
 
 static void create(ELEMENT_CREATE_FUNC_ARGS)
 {
-	int randhue = RNG::Ref().between(0, 359);
-	int randomdir = RNG::Ref().between(0, 3);
+	int randhue = sim->rng.between(0, 359);
+	int randomdir = sim->rng.between(0, 3);
 	// Set as a head and a direction
 	sim->parts[i].tmp = 1 | (randomdir << 5) | (randhue << 7);
 	// Tail

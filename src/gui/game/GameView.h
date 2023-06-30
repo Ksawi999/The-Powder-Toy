@@ -1,9 +1,8 @@
-#ifndef GAMEVIEW_H
-#define GAMEVIEW_H
-
+#pragma once
 #include <ctime>
-#include <vector>
 #include <deque>
+#include <memory>
+#include <vector>
 #include "common/String.h"
 #include "gui/interface/Window.h"
 #include "simulation/Sample.h"
@@ -80,7 +79,7 @@ private:
 	ui::Point currentPoint, lastPoint;
 	GameController * c;
 	Renderer * ren;
-	Brush * activeBrush;
+	Brush const *activeBrush;
 	//UI Elements
 	std::vector<ui::Button*> quickOptionButtons;
 
@@ -118,8 +117,12 @@ private:
 	ui::Point currentMouse;
 	ui::Point mousePosition;
 
-	VideoBuffer * placeSaveThumb;
-	ui::Point placeSaveOffset;
+	std::unique_ptr<VideoBuffer> placeSaveThumb;
+	Mat2<int> placeSaveTransform = Mat2<int>::Identity;
+	Vec2<int> placeSaveTranslate = Vec2<int>::Zero;
+	void TranslateSave(Vec2<int> addToTranslate);
+	void TransformSave(Mat2<int> mulToTransform);
+	void ApplyTransformPlaceSave();
 
 	SimulationSample sample;
 
@@ -135,6 +138,9 @@ private:
 	void disableAltBehaviour();
 	void UpdateDrawMode();
 	void UpdateToolStrength();
+
+	Vec2<int> PlaceSavePos() const;
+
 public:
 	GameView();
 	virtual ~GameView();
@@ -156,8 +162,6 @@ public:
 	bool AltBehaviour(){ return altBehaviour; }
 	SelectMode GetSelectMode() { return selectMode; }
 	void BeginStampSelection();
-	ui::Point GetPlaceSaveOffset() { return placeSaveOffset; }
-	void SetPlaceSaveOffset(ui::Point offset) { placeSaveOffset = offset; }
 	ByteString TakeScreenshot(int captureUI, int fileType);
 	int Record(bool record);
 
@@ -186,6 +190,7 @@ public:
 	void NotifyColourPresetsChanged(GameModel * sender);
 	void NotifyColourActivePresetChanged(GameModel * sender);
 	void NotifyPlaceSaveChanged(GameModel * sender);
+	void NotifyTransformedPlaceSaveChanged(GameModel *sender);
 	void NotifyNotificationsChanged(GameModel * sender);
 	void NotifyLogChanged(GameModel * sender, String entry);
 	void NotifyToolTipChanged(GameModel * sender);
@@ -221,5 +226,3 @@ public:
 
 	class OptionListener;
 };
-
-#endif // GAMEVIEW_H

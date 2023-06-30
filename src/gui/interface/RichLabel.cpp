@@ -1,16 +1,12 @@
 #include "RichLabel.h"
-
-#include <vector>
-#include <exception>
-
 #include "Colour.h"
-
-#include "common/Platform.h"
+#include "common/platform/Platform.h"
 #include "graphics/FontReader.h"
 #include "graphics/Graphics.h"
-
 #include "gui/interface/Component.h"
 #include "gui/interface/Point.h"
+#include <vector>
+#include <exception>
 
 using namespace ui;
 
@@ -183,7 +179,7 @@ void RichLabel::Draw(const Point& screenPos)
 {
 	Graphics * g = GetGraphics();
 	ui::Colour textColour = Appearance.TextInactive;
-	g->drawtext(screenPos.X+textPosition.X, screenPos.Y+textPosition.Y, displayText, textColour.Red, textColour.Green, textColour.Blue, 255);
+	g->BlendText(screenPos + textPosition, displayText, textColour.NoAlpha().WithAlpha(255));
 }
 
 void RichLabel::OnMouseClick(int x, int y, unsigned button)

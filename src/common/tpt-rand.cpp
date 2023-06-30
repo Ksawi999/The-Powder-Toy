@@ -62,4 +62,4 @@ void RNG::seed(unsigned int sd)
 	s[1] = sd;
 }
 
-RNG random_gen;
+RNG interfaceRng;

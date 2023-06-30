@@ -1,16 +1,18 @@
-#ifndef LUASCRIPTINTERFACE_H_
-#define LUASCRIPTINTERFACE_H_
-#include "Config.h"
-
+#pragma once
 #include "LuaCompat.h"
 #include "LuaSmartRef.h"
-
 #include "CommandInterface.h"
-#include "lua/LuaEvents.h"
+#include "gui/game/GameControllerEvents.h"
+#include "TPTScriptInterface.h"
 #include "simulation/StructProperty.h"
 #include "simulation/ElementDefs.h"
-
 #include <map>
+#include <memory>
+
+namespace http
+{
+	class Request;
+}
 
 namespace ui
 {
@@ -21,30 +23,20 @@ class Tool;
 
 //Because lua only has bindings for C, we're going to have to go outside "outside" the LuaScriptInterface, this means we can only have one instance :(
 
-#define LUACON_MDOWN 1
-#define LUACON_MUP 2
-#define LUACON_MPRESS 3
-#define LUACON_MUPALT 4
-#define LUACON_MUPZOOM 5
-#define LUACON_KDOWN 1
-#define LUACON_KUP 2
-
-//Bitmasks for things that might need recalculating after changes to tpt.el
-#define LUACON_EL_MODIFIED_CANMOVE 0x1
-#define LUACON_EL_MODIFIED_GRAPHICS 0x2
-#define LUACON_EL_MODIFIED_MENUS 0x4
-
 class Simulation;
-class TPTScriptInterface;
 class LuaComponent;
 
-class LuaScriptInterface: public CommandInterface
+class LuaScriptInterface: public TPTScriptInterface
 {
+	std::unique_ptr<http::Request> scriptDownload;
+	ByteString scriptDownloadFilename;
+	bool scriptDownloadRunScript;
+	bool scriptDownloadConfirmPrompt;
+
 	int luacon_mousex, luacon_mousey, luacon_mousebutton;
 	ByteString luacon_selectedl, luacon_selectedr, luacon_selectedalt, luacon_selectedreplace;
 	bool luacon_mousedown;
 	bool currentCommand;
-	TPTScriptInterface * legacy;
 	int textInputRefcount;
 
 	// signs
@@ -123,6 +115,7 @@ class LuaScriptInterface: public CommandInterface
 	static int simulation_removeCustomGol(lua_State *l);
 	static int simulation_lastUpdatedID(lua_State *l);
 	static int simulation_updateUpTo(lua_State *l);
+	static int simulation_temperatureScale(lua_State *l);
 
 
 	//Renderer
@@ -187,7 +180,6 @@ class LuaScriptInterface: public CommandInterface
 	void initPlatformAPI();
 	static int platform_platform(lua_State * l);
 	static int platform_ident(lua_State * l);
-	static int platform_build(lua_State * l);
 	static int platform_releaseType(lua_State * l);
 	static int platform_exeName(lua_State * l);
 	static int platform_restart(lua_State * l);
@@ -200,14 +192,14 @@ class LuaScriptInterface: public CommandInterface
 	static int event_unregister(lua_State * l);
 	static int event_getmodifiers(lua_State * l);
 
-	void initHttpAPI();
-	static int http_get(lua_State * l);
-	static int http_post(lua_State * l);
+	static int luatpt_getscript(lua_State * l);
 
+	void initHttpAPI();
 	void initSocketAPI();
 
 	std::vector<LuaSmartRef> lua_el_func_v, lua_gr_func_v, lua_cd_func_v;
 	std::vector<int> lua_el_mode_v;
+	std::vector<LuaSmartRef> gameControllerEventHandlers;
 
 public:
 	int tpt_index(lua_State *l);
@@ -215,9 +207,11 @@ public:
 
 	static void LuaGetProperty(lua_State* l, StructProperty property, intptr_t propertyAddress);
 	static void LuaSetProperty(lua_State* l, StructProperty property, intptr_t propertyAddress, int stackPos);
+	static void LuaSetParticleProperty(lua_State* l, int particleID, StructProperty property, intptr_t propertyAddress, int stackPos);
 
 	ui::Window * Window;
 	lua_State *l;
+	long unsigned int luaExecutionStart = 0;
 	std::map<LuaComponent *, LuaSmartRef> grabbed_components;
 	LuaScriptInterface(GameController * c, GameModel * m);
 
@@ -225,16 +219,14 @@ public:
 	void custom_init_can_move();
 
 	void OnTick() override;
-	bool HandleEvent(LuaEvents::EventTypes eventType, Event * event) override;
+	bool HandleEvent(const GameControllerEvent &event) override;
 
-	void Init();
+	void Init() override;
 	void SetWindow(ui::Window * window);
 	int Command(String command) override;
 	String FormatCommand(String command) override;
 	virtual ~LuaScriptInterface();
 };
-
-extern LuaScriptInterface *luacon_ci;
 
 void tpt_lua_pushByteString(lua_State *L, const ByteString &str);
 void tpt_lua_pushString(lua_State *L, const String &str);
@@ -262,4 +254,5 @@ bool tpt_lua_equalsLiteral(lua_State *L, int index, const char (&lit)[N])
 	return tpt_lua_equalsString(L, index, lit, N - 1U);
 }
 
-#endif /* LUASCRIPTINTERFACE_H_ */
+int tpt_lua_pcall(lua_State *L, int numArgs, int numResults, int errorFunc, bool simEvent);
+

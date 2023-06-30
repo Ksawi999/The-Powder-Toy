@@ -1,6 +1,4 @@
-#ifndef TOOLBUTTON_H_
-#define TOOLBUTTON_H_
-
+#pragma once
 #include "gui/interface/Button.h"
 
 class Tool;
@@ -18,10 +16,5 @@ public:
 	void SetSelectionState(int state);
 	int GetSelectionState();
 	Tool *tool;
-	int clipRectX = 0;
-	int clipRectY = 0;
-	int clipRectW = 0;
-	int clipRectH = 0;
+	Rect<int> ClipRect = RectSized(Vec2<int>::Zero, Vec2<int>::Zero);
 };
-
-#endif /* TOOLBUTTON_H_ */

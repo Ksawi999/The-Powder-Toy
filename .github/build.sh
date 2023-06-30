@@ -43,6 +43,28 @@ aarch64-android-bionic-static) ;;
 *) >&2 echo "configuration $BSH_HOST_ARCH-$BSH_HOST_PLATFORM-$BSH_HOST_LIBC-$BSH_STATIC_DYNAMIC is not supported" && exit 1;;
 esac
 
+if [[ -z ${BSH_NO_PACKAGES-} ]]; then
+	case $BSH_BUILD_PLATFORM in
+	linux)
+		sudo apt update
+		if [[ $BSH_STATIC_DYNAMIC == static ]]; then
+			sudo apt install libc6-dev libc6-dev-i386
+		else
+			sudo apt install libluajit-5.1-dev libcurl4-openssl-dev libfftw3-dev zlib1g-dev libsdl2-dev libbz2-dev libjsoncpp-dev
+		fi
+		if [[ $BSH_HOST_PLATFORM-$BSH_HOST_LIBC == windows-mingw ]]; then
+			sudo apt install g++-mingw-w64-x86-64
+		fi
+		;;
+	darwin)
+		brew install pkg-config binutils
+		if [[ $BSH_STATIC_DYNAMIC != static ]]; then
+			brew install luajit curl fftw zlib sdl2 bzip2 jsoncpp
+		fi
+		;;
+	esac
+fi
+
 function inplace_sed() {
 	local subst=$1
 	local path=$2
@@ -163,7 +185,6 @@ meson_configure+=$'\t'-Dapp_data=$APP_DATA
 meson_configure+=$'\t'-Dapp_vendor=$APP_VENDOR
 meson_configure+=$'\t'-Db_strip=false
 meson_configure+=$'\t'-Db_staticpic=false
-meson_configure+=$'\t'-Dinstall_check=true
 meson_configure+=$'\t'-Dmod_id=$MOD_ID
 case $BSH_HOST_ARCH-$BSH_HOST_PLATFORM-$BSH_HOST_LIBC-$BSH_DEBUG_RELEASE in
 x86_64-linux-gnu-debug) ;&
@@ -174,6 +195,12 @@ x86_64-darwin-macos-debug)
 	meson_configure+=$'\t'-Dbuild_font=true
 	;;
 esac
+if [[ $PACKAGE_MODE == nohttp ]]; then
+	meson_configure+=$'\t'-Dhttp=false
+fi
+if [[ $PACKAGE_MODE == nolua ]]; then
+	meson_configure+=$'\t'-Dlua=none
+fi
 if [[ $BSH_STATIC_DYNAMIC == static ]]; then
 	meson_configure+=$'\t'-Dstatic=prebuilt
 	if [[ $BSH_HOST_PLATFORM == windows ]]; then
@@ -212,9 +239,15 @@ fi
 if [[ $RELEASE_TYPE == stable ]]; then
 	stable_or_beta=yes
 fi
-save_version=$(grep -w src/Config.template.h -e "#define SAVE_VERSION" | cut -d ' ' -f 3)
-minor_version=$(grep -w src/Config.template.h -e "#define MINOR_VERSION" | cut -d ' ' -f 3)
-build_num=$(grep -w src/Config.template.h -e "#define BUILD_NUM" | cut -d ' ' -f 3)
+set +e
+save_version=$(cat src/Config.template.h | sed -n 's/constexpr int SAVE_VERSION * = \([^;]*\);/\1/p')
+minor_version=$(cat src/Config.template.h | sed -n 's/constexpr int MINOR_VERSION * = \([^;]*\);/\1/p')
+build_num=$(cat src/Config.template.h | sed -n 's/constexpr int BUILD_NUM * = \([^;]*\);/\1/p')
+if [[ -z ${save_version-} ]] || [[ -z ${minor_version-} ]] || [[ -z ${build_num-} ]]; then
+	>&2 echo "failed to extract version from Config.template.h"
+	exit 1
+fi
+set -e
 if [[ $stable_or_beta == yes ]] && [[ $MOD_ID != 0 ]]; then
 	save_version=$(echo $RELEASE_NAME | cut -d '.' -f 1)
 	minor_version=$(echo $RELEASE_NAME | cut -d '.' -f 2)
@@ -252,9 +285,14 @@ if [[ $BSH_HOST_PLATFORM-$BSH_HOST_ARCH == darwin-aarch64 ]]; then
 	meson_configure+=$'\t'--cross-file=.github/macaa64-ghactions.ini
 fi
 if [[ $RELEASE_TYPE == tptlibsdev ]] && ([[ $BSH_HOST_PLATFORM == windows ]] || [[ $BSH_STATIC_DYNAMIC == static ]]); then
-	if [[ -z "${GITHUB_REPOSITORY_OWNER-}" ]]; then
-		>&2 echo "GITHUB_REPOSITORY_OWNER not set"
-		exit 1
+	if [[ -z ${TPTLIBSREMOTE-} ]]; then
+		if [[ -z "${GITHUB_REPOSITORY_OWNER-}" ]]; then
+			>&2 echo "GITHUB_REPOSITORY_OWNER not set"
+			exit 1
+		fi
+		tptlibsremote=https://github.com/$GITHUB_REPOSITORY_OWNER/tpt-libs
+	else
+		tptlibsremote=$TPTLIBSREMOTE
 	fi
 	if [[ "$BSH_HOST_ARCH-$BSH_HOST_PLATFORM-$BSH_HOST_LIBC-$BSH_STATIC_DYNAMIC $BSH_BUILD_PLATFORM" == "x86_64-windows-mingw-dynamic linux" ]]; then
 		>&2 echo "this configuration is not supported in tptlibsdev mode"
@@ -262,10 +300,13 @@ if [[ $RELEASE_TYPE == tptlibsdev ]] && ([[ $BSH_HOST_PLATFORM == windows ]] || 
 		exit 0
 	fi
 	tptlibsbranch=$(echo $RELEASE_NAME | cut -d '-' -f 2-) # $RELEASE_NAME is tptlibsdev-BRANCH
+	if [[ -d build-tpt-libs ]] && [[ ${TPTLIBSRESET-} == yes ]]; then
+		rm -rf build-tpt-libs
+	fi
 	if [[ ! -d build-tpt-libs/tpt-libs ]]; then
 		mkdir -p build-tpt-libs
 		cd build-tpt-libs
-		git clone https://github.com/$GITHUB_REPOSITORY_OWNER/tpt-libs --branch $tptlibsbranch --depth 1
+		git clone $tptlibsremote --branch $tptlibsbranch --depth 1
 		cd ..
 	fi
 	tpt_libs_vtag=v00000000000000
@@ -331,7 +372,7 @@ if [[ $BSH_HOST_PLATFORM == android ]]; then
 fi
 if [[ $PACKAGE_MODE == appimage ]]; then
 	# so far this can only happen with $BSH_HOST_PLATFORM-$BSH_HOST_LIBC == linux-gnu, but this may change later
-	meson configure -Dinstall_check=false -Dignore_updates=true -Dbuild_render=false -Dbuild_font=false
+	meson configure -Dcan_install=no -Dignore_updates=true -Dbuild_render=false -Dbuild_font=false
 	strip_target=$APP_EXE
 fi
 if [[ $BSH_BUILD_PLATFORM == windows ]]; then
@@ -341,6 +382,14 @@ if [[ $BSH_BUILD_PLATFORM == windows ]]; then
 	set -e
 	cat $APP_EXE.exe.rsp
 	[[ $ninja_code == 0 ]];
+	echo # rsps don't usually have a newline at the end
+	if [[ "$BSH_HOST_PLATFORM-$BSH_STATIC_DYNAMIC $BSH_BUILD_PLATFORM" == "windows-dynamic windows" ]]; then
+		# on windows we provide the dynamic dependencies also; makes sense to check for their presence
+		# msys ldd works fine but only on windows build machines
+		if ldd $APP_EXE | grep "not found"; then
+			exit 1 # ldd | grep will have printed missing deps
+		fi
+	fi
 else
 	ninja -v
 fi
@@ -383,8 +432,7 @@ if [[ $PACKAGE_MODE == dmg ]]; then
 	mv $appdir dmgroot/$appdir
 	cp ../LICENSE dmgroot/LICENSE
 	cp ../README.md dmgroot/README.md
-	hdiutil create uncompressed.dmg -ov -volname $APP_NAME -fs HFS+ -srcfolder dmgroot
-	hdiutil convert uncompressed.dmg -format UDZO -o $ASSET_PATH
+	hdiutil create -format UDZO -volname $APP_NAME -fs HFS+ -srcfolder dmgroot -o $ASSET_PATH
 elif [[ $PACKAGE_MODE == appimage ]]; then
 	# so far this can only happen with $BSH_HOST_PLATFORM-$BSH_HOST_LIBC == linux-gnu, but this may change later
 	case $BSH_HOST_ARCH in

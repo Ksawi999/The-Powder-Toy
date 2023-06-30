@@ -1,10 +1,5 @@
-#include "Config.h"
-#ifdef LUACONSOLE
-
 #include "LuaButton.h"
-
 #include "LuaScriptInterface.h"
-
 #include "gui/interface/Button.h"
 
 const char LuaButton::className[] = "Button";
@@ -78,7 +73,7 @@ void LuaButton::triggerAction()
 	{
 		lua_rawgeti(l, LUA_REGISTRYINDEX, actionFunction);
 		lua_rawgeti(l, LUA_REGISTRYINDEX, owner_ref);
-		if (lua_pcall(l, 1, 0, 0))
+		if (tpt_lua_pcall(l, 1, 0, 0, false))
 		{
 			ci->Log(CommandInterface::LogError, tpt_lua_toString(l, -1));
 		}
@@ -88,4 +83,3 @@ void LuaButton::triggerAction()
 LuaButton::~LuaButton()
 {
 }
-#endif

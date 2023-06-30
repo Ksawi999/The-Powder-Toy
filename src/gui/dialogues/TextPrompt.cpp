@@ -6,7 +6,7 @@
 #include "gui/interface/Textbox.h"
 
 #include "gui/Style.h"
-#include "PowderToy.h"
+#include "PowderToySDL.h"
 
 #include "graphics/Graphics.h"
 
@@ -93,6 +93,6 @@ void TextPrompt::OnDraw()
 {
 	Graphics * g = GetGraphics();
 
-	g->clearrect(Position.X-2, Position.Y-2, Size.X+3, Size.Y+3);
-	g->drawrect(Position.X, Position.Y, Size.X, Size.Y, 200, 200, 200, 255);
+	g->DrawFilledRect(RectSized(Position - Vec2{ 1, 1 }, Size + Vec2{ 2, 2 }), 0x000000_rgb);
+	g->DrawRect(RectSized(Position, Size), 0xC8C8C8_rgb);
 }

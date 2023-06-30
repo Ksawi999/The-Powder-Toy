@@ -1,7 +1,4 @@
-#ifndef OPTIONSMODEL_H_
-#define OPTIONSMODEL_H_
-#include "Config.h"
-
+#pragma once
 #include <vector>
 
 class GameModel;
@@ -42,6 +39,8 @@ public:
 	void SetCustomGravityY(float y);
 	int GetScale();
 	void SetScale(int scale);
+	bool GetGraveExitsConsole();
+	void SetGraveExitsConsole(bool graveExitsConsole);
 	bool GetResizable();
 	void SetResizable(bool resizable);
 	bool GetFullscreen();
@@ -64,5 +63,3 @@ public:
 	void SetMomentumScroll(bool momentumScroll);
 	virtual ~OptionsModel();
 };
-
-#endif /* OPTIONSMODEL_H_ */

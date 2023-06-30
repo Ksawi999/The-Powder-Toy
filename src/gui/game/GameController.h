@@ -1,20 +1,14 @@
-#ifndef GAMECONTROLLER_H
-#define GAMECONTROLLER_H
-#include "Config.h"
-
+#pragma once
+#include "client/ClientListener.h"
+#include "client/StartupInfo.h"
+#include "gui/interface/Point.h"
+#include "gui/interface/Colour.h"
+#include "simulation/Sign.h"
+#include "simulation/Particle.h"
+#include "Misc.h"
 #include <vector>
 #include <utility>
 #include <memory>
-
-#include "client/ClientListener.h"
-
-#include "gui/interface/Point.h"
-#include "gui/interface/Colour.h"
-
-#include "simulation/Sign.h"
-#include "simulation/Particle.h"
-
-#include "Misc.h"
 
 class DebugInfo;
 class SaveFile;
@@ -28,6 +22,7 @@ class SearchController;
 class PreviewController;
 class RenderController;
 class CommandInterface;
+class VideoBuffer;
 class Tool;
 class Menu;
 class SaveInfo;
@@ -51,7 +46,6 @@ private:
 	TagsController * tagsWindow;
 	LocalBrowserController * localBrowser;
 	OptionsController * options;
-	CommandInterface * commandInterface;
 	std::vector<DebugInfo*> debugInfo;
 	std::unique_ptr<Snapshot> beforeRestore;
 	unsigned int debugFlags;
@@ -135,8 +129,8 @@ public:
 	void SetActiveColourPreset(int preset);
 	void SetColour(ui::Colour colour);
 	void SetToolStrength(float value);
-	void LoadSaveFile(SaveFile * file);
-	void LoadSave(SaveInfo * save);
+	void LoadSaveFile(std::unique_ptr<SaveFile> file);
+	void LoadSave(std::unique_ptr<SaveInfo> save);
 	void OpenSearch(String searchText);
 	void OpenLogin();
 	void OpenProfile();
@@ -160,10 +154,10 @@ public:
 	void ShowConsole();
 	void HideConsole();
 	void FrameStep();
-	void TranslateSave(ui::Point point);
-	void TransformSave(matrix2d transform);
+	void TransformPlaceSave(Mat2<int> transform, Vec2<int> nudge);
 	bool MouseInZoom(ui::Point position);
 	ui::Point PointTranslate(ui::Point point);
+	ui::Point PointTranslateNoClamp(ui::Point point);
 	ui::Point NormaliseBlockCoord(ui::Point point);
 	String ElementResolve(int type, int ctype);
 	String BasicParticleInfo(Particle const &sample_part);
@@ -182,17 +176,15 @@ public:
 	void ToggleNewtonianGravity();
 
 	bool LoadClipboard();
-	void LoadStamp(GameSave *stamp);
+	void LoadStamp(std::unique_ptr<GameSave> stamp);
 
 	void RemoveNotification(Notification * notification);
 
 	void NotifyUpdateAvailable(Client * sender) override;
 	void NotifyAuthUserChanged(Client * sender) override;
-	void NotifyNewNotification(Client * sender, std::pair<String, ByteString> notification) override;
-	void RunUpdater();
+	void NotifyNewNotification(Client * sender, ServerNotification notification) override;
+	void RunUpdater(UpdateInfo info);
 	bool GetMouseClickRequired();
 
 	void RemoveCustomGOLType(const ByteString &identifier);
 };
-
-#endif // GAMECONTROLLER_H

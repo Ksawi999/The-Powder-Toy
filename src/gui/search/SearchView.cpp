@@ -1,23 +1,18 @@
 #include "SearchView.h"
-
 #include "SearchController.h"
 #include "SearchModel.h"
-
 #include "client/Client.h"
 #include "client/SaveInfo.h"
-
-#include "gui/interface/Keys.h"
 #include "gui/interface/SaveButton.h"
 #include "gui/interface/Button.h"
 #include "gui/interface/Label.h"
 #include "gui/interface/RichLabel.h"
 #include "gui/interface/Textbox.h"
 #include "gui/interface/Spinner.h"
-
-#include "PowderToy.h"
-#include "Config.h"
-
+#include "PowderToySDL.h"
 #include "graphics/Graphics.h"
+#include "SimulationConfig.h"
+#include <SDL.h>
 
 #ifdef GetUserName
 # undef GetUserName // dammit windows
@@ -216,7 +211,7 @@ void SearchView::Search(String query)
 
 void SearchView::NotifySortChanged(SearchModel * sender)
 {
-	if(sender->GetSort() == "best")
+	if(sender->GetSort() == http::sortByVotes)
 	{
 		sortButton->SetToggleState(false);
 		sortButton->SetText("By votes");
@@ -233,7 +228,7 @@ void SearchView::NotifySortChanged(SearchModel * sender)
 void SearchView::NotifyShowOwnChanged(SearchModel * sender)
 {
 	ownButton->SetToggleState(sender->GetShowOwn());
-	if(sender->GetShowOwn() || Client::Ref().GetAuthUser().UserElevation == User::ElevationAdmin || Client::Ref().GetAuthUser().UserElevation == User::ElevationModerator)
+	if(sender->GetShowOwn() || Client::Ref().GetAuthUser().UserElevation == User::ElevationAdmin || Client::Ref().GetAuthUser().UserElevation == User::ElevationMod)
 	{
 		unpublishSelected->Enabled = true;
 		removeSelected->Enabled = true;
@@ -253,7 +248,7 @@ void SearchView::NotifyShowFavouriteChanged(SearchModel * sender)
 		unpublishSelected->Enabled = false;
 		removeSelected->Enabled = false;
 	}
-	else if(sender->GetShowOwn() || Client::Ref().GetAuthUser().UserElevation == User::ElevationAdmin || Client::Ref().GetAuthUser().UserElevation == User::ElevationModerator)
+	else if(sender->GetShowOwn() || Client::Ref().GetAuthUser().UserElevation == User::ElevationAdmin || Client::Ref().GetAuthUser().UserElevation == User::ElevationMod)
 	{
 		unpublishSelected->Enabled = true;
 		removeSelected->Enabled = true;
@@ -276,7 +271,7 @@ void SearchView::NotifyPageChanged(SearchModel * sender)
 	{
 		String pageInfo = String::Build("of ", pageCount);
 		pageCountLabel->SetText(pageInfo);
-		int width = Graphics::textwidth(pageInfo);
+		int width = Graphics::TextSize(pageInfo).X - 1;
 
 		pageLabel->Position.X = WINDOWW/2-width-20;
 		pageTextbox->Position.X = WINDOWW/2-width+11;
@@ -328,7 +323,7 @@ void SearchView::CheckAccess()
 		favButton->Enabled = true;
 		favouriteSelected->Enabled = true;
 
-		if (Client::Ref().GetAuthUser().UserElevation == User::ElevationAdmin || Client::Ref().GetAuthUser().UserElevation == User::ElevationModerator)
+		if (Client::Ref().GetAuthUser().UserElevation == User::ElevationAdmin || Client::Ref().GetAuthUser().UserElevation == User::ElevationMod)
 		{
 			unpublishSelected->Enabled = true;
 			removeSelected->Enabled = true;
@@ -461,7 +456,7 @@ void SearchView::NotifySaveListChanged(SearchModel * sender)
 	int buttonWidth, buttonHeight, saveX = 0, saveY = 0, savesX = 5, savesY = 4, buttonPadding = 1;
 	int buttonAreaWidth, buttonAreaHeight, buttonXOffset, buttonYOffset;
 
-	std::vector<SaveInfo*> saves = sender->GetSaveList();
+	auto saves = sender->GetSaveList();
 	//string messageOfTheDay = sender->GetMessageOfTheDay();
 
 	if(sender->GetShowFavourite())
@@ -567,14 +562,14 @@ void SearchView::NotifySaveListChanged(SearchModel * sender)
 						saves[i]);
 			saveButton->AddContextMenu(0);
 			saveButton->SetActionCallback({
-				[this, saveButton] { c->OpenSave(saveButton->GetSave()->GetID(), saveButton->GetSave()->GetVersion()); },
+				[this, saveButton] { c->OpenSave(saveButton->GetSave()->GetID(), saveButton->GetSave()->GetVersion(), saveButton->CloneThumbnail()); },
 				[this, saveButton] { Search(String::Build("history:", saveButton->GetSave()->GetID())); },
 				[this, saveButton] { Search(String::Build("user:", saveButton->GetSave()->GetUserName().FromUtf8())); },
 				[this, saveButton] { c->Selected(saveButton->GetSave()->GetID(), saveButton->GetSelected()); }
 			});
 			if(Client::Ref().GetAuthUser().UserID)
 				saveButton->SetSelectable(true);
-			if (saves[i]->GetUserName() == Client::Ref().GetAuthUser().Username || Client::Ref().GetAuthUser().UserElevation == User::ElevationAdmin || Client::Ref().GetAuthUser().UserElevation == User::ElevationModerator)
+			if (saves[i]->GetUserName() == Client::Ref().GetAuthUser().Username || Client::Ref().GetAuthUser().UserElevation == User::ElevationAdmin || Client::Ref().GetAuthUser().UserElevation == User::ElevationMod)
 				saveButton->SetShowVotes(true);
 			saveButtons.push_back(saveButton);
 			AddComponent(saveButton);
