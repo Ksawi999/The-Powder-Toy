@@ -3101,14 +3101,14 @@ killed:
 						unsigned int mask = 0;
 						if (TYP(r) != PT_LITH && ((elements[TYP(r)].MenuSection != SC_SPECIAL && elements[TYP(r)].MenuSection > SC_FORCE) || (elements[TYP(r)].Properties & PROP_CONDUCTS) || TYP(r) == PT_SPRK) && (!(TYP(r) == PT_BRAY || TYP(r) == PT_BIZR || TYP(r) == PT_BIZRG || TYP(r) == PT_BIZRS) || parts[ID(r)].dcolour))
 						{
-							int cr = PIXR(elements[TYP(r)].Colour);
-							int cg = PIXG(elements[TYP(r)].Colour);
-							int cb = PIXB(elements[TYP(r)].Colour);
+							int cr = elements[TYP(r)].Colour.Red;
+							int cg = elements[TYP(r)].Colour.Green;
+							int cb = elements[TYP(r)].Colour.Blue
 							if(TYP(r) == PT_SPRK)
 							{
-								cr = PIXR(elements[parts[ID(r)].ctype].Colour);
-								cg = PIXG(elements[parts[ID(r)].ctype].Colour);
-								cb = PIXB(elements[parts[ID(r)].ctype].Colour);
+								cr = elements[parts[ID(r)].ctype].Colour.Red;
+								cg = elements[parts[ID(r)].ctype].Colour.Green;
+								cb = elements[parts[ID(r)].ctype].Colour.Blue;
 							}
 							if(parts[ID(r)].dcolour)
 							{
