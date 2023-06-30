@@ -1,10 +1,5 @@
-#include "Config.h"
-#ifdef LUACONSOLE
-
 #include "LuaCheckbox.h"
-
 #include "LuaScriptInterface.h"
-
 #include "gui/interface/Checkbox.h"
 
 const char LuaCheckbox::className[] = "Checkbox";
@@ -77,7 +72,7 @@ void LuaCheckbox::triggerAction()
 		lua_rawgeti(l, LUA_REGISTRYINDEX, actionFunction);
 		lua_rawgeti(l, LUA_REGISTRYINDEX, owner_ref);
 		lua_pushboolean(l, checkbox->GetChecked());
-		if (lua_pcall(l, 2, 0, 0))
+		if (tpt_lua_pcall(l, 2, 0, 0, false))
 		{
 			ci->Log(CommandInterface::LogError, tpt_lua_toString(l, -1));
 		}
@@ -87,4 +82,3 @@ void LuaCheckbox::triggerAction()
 LuaCheckbox::~LuaCheckbox()
 {
 }
-#endif

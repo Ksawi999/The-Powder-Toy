@@ -4,6 +4,8 @@
 #include "LocalBrowserView.h"
 
 #include "client/Client.h"
+#include "client/GameSave.h"
+#include "client/SaveFile.h"
 #include "gui/dialogues/ConfirmPrompt.h"
 #include "tasks/TaskWindow.h"
 #include "tasks/Task.h"
@@ -25,14 +27,14 @@ LocalBrowserController::LocalBrowserController(std::function<void ()> onDone_):
 	browserModel->UpdateSavesList(1);
 }
 
-void LocalBrowserController::OpenSave(SaveFile * save)
+void LocalBrowserController::OpenSave(int index)
 {
-	browserModel->SetSave(save);
+	browserModel->OpenSave(index);
 }
 
-SaveFile * LocalBrowserController::GetSave()
+std::unique_ptr<SaveFile> LocalBrowserController::TakeSave()
 {
-	return browserModel->GetSave();
+	return browserModel->TakeSave();
 }
 
 void LocalBrowserController::RemoveSelected()
@@ -65,7 +67,6 @@ void LocalBrowserController::removeSelectedC()
 		}
 		void after() override
 		{
-			Client::Ref().updateStamps();
 			c->RefreshSavesList();
 		}
 	};
@@ -75,11 +76,6 @@ void LocalBrowserController::removeSelectedC()
 }
 
 void LocalBrowserController::RescanStamps()
-{
-	new ConfirmPrompt("Rescan", "Rescanning the stamps folder can find stamps added to the stamps folder or recover stamps when the stamps.def file has been lost or damaged. However, be warned that this will mess up the current sorting order", { [this] { rescanStampsC(); } });
-}
-
-void LocalBrowserController::rescanStampsC()
 {
 	browserModel->RescanStamps();
 	browserModel->UpdateSavesList(browserModel->GetPageNum());
@@ -111,7 +107,7 @@ void LocalBrowserController::SetPageRelative(int offset)
 
 void LocalBrowserController::Update()
 {
-	if(browserModel->GetSave())
+	if (browserModel->GetSave())
 	{
 		Exit();
 	}
@@ -145,8 +141,10 @@ void LocalBrowserController::Exit()
 
 LocalBrowserController::~LocalBrowserController()
 {
-	browserView->CloseActiveWindow();
 	delete browserModel;
-	delete browserView;
+	if (browserView->CloseActiveWindow())
+	{
+		delete browserView;
+	}
 }
 

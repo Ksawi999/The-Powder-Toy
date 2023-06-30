@@ -4,7 +4,7 @@
 Element::Element():
 	Identifier("DEFAULT_INVALID"),
 	Name(""),
-	Colour(PIXPACK(0xFF00FF)),
+	Colour(0xFF00FF_rgb),
 	MenuVisible(0),
 	MenuSection(0),
 	Enabled(0),
@@ -31,6 +31,7 @@ Element::Element():
 	Description("No description"),
 
 	Properties(TYPE_SOLID),
+	CarriesTypeIn(0),
 
 	LowPressure(IPL),
 	LowPressureTransition(NT),
@@ -73,6 +74,7 @@ std::vector<StructProperty> const &Element::GetProperties()
 		{ "Explosive",                 StructProperty::Integer,  offsetof(Element, Explosive                ) },
 		{ "Meltable",                  StructProperty::Integer,  offsetof(Element, Meltable                 ) },
 		{ "Hardness",                  StructProperty::Integer,  offsetof(Element, Hardness                 ) },
+		{ "CarriesTypeIn",             StructProperty::UInteger, offsetof(Element, CarriesTypeIn            ) },
 		{ "Weight",                    StructProperty::Integer,  offsetof(Element, Weight                   ) },
 		{ "Temperature",               StructProperty::Float,    offsetof(Element, DefaultProperties.temp   ) },
 		{ "HeatConduct",               StructProperty::UChar,    offsetof(Element, HeatConduct              ) },
@@ -103,15 +105,15 @@ int Element::legacyUpdate(UPDATE_FUNC_ARGS) {
 					r = pmap[y+ry][x+rx];
 					if (!r)
 						continue;
-					if ((TYP(r)==PT_WATR||TYP(r)==PT_DSTW||TYP(r)==PT_SLTW) && RNG::Ref().chance(1, 1000))
+					if ((TYP(r)==PT_WATR||TYP(r)==PT_DSTW||TYP(r)==PT_SLTW) && sim->rng.chance(1, 1000))
 					{
 						sim->part_change_type(i,x,y,PT_WATR);
 						sim->part_change_type(ID(r),x+rx,y+ry,PT_WATR);
 					}
-					if ((TYP(r)==PT_ICEI || TYP(r)==PT_SNOW) && RNG::Ref().chance(1, 1000))
+					if ((TYP(r)==PT_ICEI || TYP(r)==PT_SNOW) && sim->rng.chance(1, 1000))
 					{
 						sim->part_change_type(i,x,y,PT_WATR);
-						if (RNG::Ref().chance(1, 1000))
+						if (sim->rng.chance(1, 1000))
 							sim->part_change_type(ID(r),x+rx,y+ry,PT_WATR);
 					}
 				}
@@ -125,7 +127,7 @@ int Element::legacyUpdate(UPDATE_FUNC_ARGS) {
 					r = pmap[y+ry][x+rx];
 					if (!r)
 						continue;
-					if ((TYP(r)==PT_FIRE || TYP(r)==PT_LAVA) && RNG::Ref().chance(1, 10))
+					if ((TYP(r)==PT_FIRE || TYP(r)==PT_LAVA) && sim->rng.chance(1, 10))
 					{
 						sim->part_change_type(i,x,y,PT_WTRV);
 					}
@@ -140,9 +142,9 @@ int Element::legacyUpdate(UPDATE_FUNC_ARGS) {
 					r = pmap[y+ry][x+rx];
 					if (!r)
 						continue;
-					if ((TYP(r)==PT_FIRE || TYP(r)==PT_LAVA) && RNG::Ref().chance(1, 10))
+					if ((TYP(r)==PT_FIRE || TYP(r)==PT_LAVA) && sim->rng.chance(1, 10))
 					{
-						if (RNG::Ref().chance(1, 4))
+						if (sim->rng.chance(1, 4))
 							sim->part_change_type(i,x,y,PT_SALT);
 						else
 							sim->part_change_type(i,x,y,PT_WTRV);
@@ -158,7 +160,7 @@ int Element::legacyUpdate(UPDATE_FUNC_ARGS) {
 					r = pmap[y+ry][x+rx];
 					if (!r)
 						continue;
-					if ((TYP(r)==PT_FIRE || TYP(r)==PT_LAVA) && RNG::Ref().chance(1, 10))
+					if ((TYP(r)==PT_FIRE || TYP(r)==PT_LAVA) && sim->rng.chance(1, 10))
 					{
 						sim->part_change_type(i,x,y,PT_WTRV);
 					}
@@ -172,7 +174,7 @@ int Element::legacyUpdate(UPDATE_FUNC_ARGS) {
 					r = pmap[y+ry][x+rx];
 					if (!r)
 						continue;
-					if ((TYP(r)==PT_WATR || TYP(r)==PT_DSTW) && RNG::Ref().chance(1, 1000))
+					if ((TYP(r)==PT_WATR || TYP(r)==PT_DSTW) && sim->rng.chance(1, 1000))
 					{
 						sim->part_change_type(i,x,y,PT_ICEI);
 						sim->part_change_type(ID(r),x+rx,y+ry,PT_ICEI);
@@ -187,12 +189,12 @@ int Element::legacyUpdate(UPDATE_FUNC_ARGS) {
 					r = pmap[y+ry][x+rx];
 					if (!r)
 						continue;
-					if ((TYP(r)==PT_WATR || TYP(r)==PT_DSTW) && RNG::Ref().chance(1, 1000))
+					if ((TYP(r)==PT_WATR || TYP(r)==PT_DSTW) && sim->rng.chance(1, 1000))
 					{
 						sim->part_change_type(i,x,y,PT_ICEI);
 						sim->part_change_type(ID(r),x+rx,y+ry,PT_ICEI);
 					}
-					if ((TYP(r)==PT_WATR || TYP(r)==PT_DSTW) && RNG::Ref().chance(3, 200))
+					if ((TYP(r)==PT_WATR || TYP(r)==PT_DSTW) && sim->rng.chance(3, 200))
 						sim->part_change_type(i,x,y,PT_WATR);
 				}
 	}
@@ -205,7 +207,7 @@ int Element::legacyUpdate(UPDATE_FUNC_ARGS) {
 	if (t==PT_DESL && sim->pv[y/CELL][x/CELL]>12.0f)
 	{
 		sim->part_change_type(i,x,y,PT_FIRE);
-		parts[i].life = RNG::Ref().between(120, 169);
+		parts[i].life = sim->rng.between(120, 169);
 	}
 	return 0;
 }

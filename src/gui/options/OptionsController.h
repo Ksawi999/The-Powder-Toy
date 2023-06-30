@@ -1,7 +1,4 @@
-#ifndef OPTIONSCONTROLLER_H_
-#define OPTIONSCONTROLLER_H_
-#include "Config.h"
-
+#pragma once
 #include <functional>
 
 class GameModel;
@@ -31,6 +28,7 @@ public:
 	void SetAltFullscreen(bool altFullscreen);
 	void SetForceIntegerScaling(bool forceIntegerScaling);
 	void SetScale(int scale);
+	void SetGraveExitsConsole(bool graveExitsConsole);
 	void SetResizable(bool resizable);
 	void SetFastQuit(bool fastquit);
 	void SetDecoSpace(int decoSpace);
@@ -44,5 +42,3 @@ public:
 	OptionsView * GetView();
 	virtual ~OptionsController();
 };
-
-#endif /* OPTIONSCONTROLLER_H_ */

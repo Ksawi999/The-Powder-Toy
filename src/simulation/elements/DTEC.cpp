@@ -6,7 +6,7 @@ void Element::Element_DTEC()
 {
 	Identifier = "DEFAULT_PT_DTEC";
 	Name = "DTEC";
-	Colour = PIXPACK(0xFD9D18);
+	Colour = 0xFD9D18_rgb;
 	MenuVisible = 1;
 	MenuSection = SC_SENSOR;
 	Enabled = 1;
@@ -32,6 +32,7 @@ void Element::Element_DTEC()
 	Description = "Detector, creates a spark when something with its ctype is nearby.";
 
 	Properties = TYPE_SOLID;
+	CarriesTypeIn = 1U << FIELD_CTYPE;
 
 	LowPressure = IPL;
 	LowPressureTransition = NT;
@@ -87,7 +88,7 @@ static int update(UPDATE_FUNC_ARGS)
 					continue;
 				if (TYP(r) == parts[i].ctype && (parts[i].ctype != PT_LIFE || parts[i].tmp == parts[ID(r)].ctype || !parts[i].tmp))
 					parts[i].life = 1;
-				if (TYP(r) == PT_PHOT || (TYP(r) == PT_BRAY && parts[ID(r)].tmp!=2))
+				if (TYP(r) == PT_PHOT || (TYP(r) == PT_BRAY && parts[ID(r)].tmp!=2) || TYP(r) == PT_BIZR || TYP(r) == PT_BIZRG || TYP(r) == PT_BIZRS)
 				{
 					setFilt = true;
 					photonWl = parts[ID(r)].ctype;

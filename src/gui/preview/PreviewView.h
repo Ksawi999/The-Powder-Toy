@@ -1,10 +1,15 @@
-#ifndef PREVIEWVIEW_H_
-#define PREVIEWVIEW_H_
-
-#include <vector>
+#pragma once
+#include <memory>
 #include <set>
+#include <vector>
 #include "common/String.h"
 #include "gui/interface/Window.h"
+
+namespace http
+{
+	class AddCommentRequest;
+	class ReportSaveRequest;
+}
 
 namespace ui
 {
@@ -22,7 +27,7 @@ class PreviewController;
 class PreviewView: public ui::Window
 {
 	PreviewController * c;
-	VideoBuffer * savePreview;
+	std::unique_ptr<VideoBuffer> savePreview;
 	ui::Button * openButton;
 	ui::Button * browserOpenButton;
 	ui::Button * favButton;
@@ -65,9 +70,13 @@ class PreviewView: public ui::Window
 	void submitComment();
 	bool CheckSwearing(String text);
 	void CheckComment();
+
+	std::unique_ptr<http::AddCommentRequest> addCommentRequest;
+	std::unique_ptr<http::ReportSaveRequest> reportSaveRequest;
+
 public:
 	void AttachController(PreviewController * controller);
-	PreviewView();
+	PreviewView(std::unique_ptr<VideoBuffer> newSavePreviev);
 	void NotifySaveChanged(PreviewModel * sender);
 	void NotifyCommentsChanged(PreviewModel * sender);
 	void NotifyCommentsPageChanged(PreviewModel * sender);
@@ -82,5 +91,3 @@ public:
 	void OnKeyPress(int key, int scan, bool repeat, bool shift, bool ctrl, bool alt) override;
 	virtual ~PreviewView();
 };
-
-#endif /* PREVIEWVIEW_H_ */

@@ -7,7 +7,7 @@ void Element::Element_GBMB()
 {
 	Identifier = "DEFAULT_PT_GBMB";
 	Name = "GBMB";
-	Colour = PIXPACK(0x1144BB);
+	Colour = 0x1144BB_rgb;
 	MenuVisible = 1;
 	MenuSection = SC_FORCE;
 	Enabled = 1;
@@ -72,9 +72,9 @@ static int update(UPDATE_FUNC_ARGS)
 			}
 	}
 	if (parts[i].life>20)
-		sim->gravmap[(y/CELL)*(XRES/CELL)+(x/CELL)] = 20;
+		sim->gravmap[(y/CELL)*XCELLS+(x/CELL)] = 20;
 	else if (parts[i].life>=1)
-		sim->gravmap[(y/CELL)*(XRES/CELL)+(x/CELL)] = -80;
+		sim->gravmap[(y/CELL)*XCELLS+(x/CELL)] = -80;
 	return 0;
 }
 

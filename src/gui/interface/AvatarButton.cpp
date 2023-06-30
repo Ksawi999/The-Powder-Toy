@@ -1,13 +1,11 @@
-#include <iostream>
-#include <typeinfo>
-
 #include "Button.h"
 #include "AvatarButton.h"
 #include "Format.h"
 #include "graphics/Graphics.h"
 #include "ContextMenu.h"
-#include "Keys.h"
-#include "Mouse.h"
+#include "Config.h"
+#include <iostream>
+#include <SDL.h>
 
 namespace ui {
 
@@ -19,21 +17,27 @@ AvatarButton::AvatarButton(Point position, Point size, ByteString username):
 
 }
 
-void AvatarButton::OnResponse(std::unique_ptr<VideoBuffer> Avatar)
-{
-	avatar = std::move(Avatar);
-}
-
 void AvatarButton::Tick(float dt)
 {
 	if (!avatar && !tried && name.size() > 0)
 	{
 		tried = true;
-		RequestSetup(SCHEME STATICSERVER "/avatars/" + name + ".png", Size.X, Size.Y);
-		RequestStart();
+		imageRequest = std::make_unique<http::ImageRequest>(ByteString::Build(SCHEME, STATICSERVER, "/avatars/", name, ".png"), Size);
+		imageRequest->Start();
 	}
 
-	RequestPoll();
+	if (imageRequest && imageRequest->CheckDone())
+	{
+		try
+		{
+			avatar = imageRequest->Finish();
+		}
+		catch (const http::RequestError &ex)
+		{
+			// Nothing, oh well.
+		}
+		imageRequest.reset();
+	}
 }
 
 void AvatarButton::Draw(const Point& screenPos)
@@ -42,7 +46,8 @@ void AvatarButton::Draw(const Point& screenPos)
 
 	if(avatar)
 	{
-		g->draw_image(avatar.get(), screenPos.X, screenPos.Y, 255);
+		auto *tex = avatar.get();
+		g->BlendImage(tex->Data(), 255, RectSized(screenPos, tex->Size()));
 	}
 }
 

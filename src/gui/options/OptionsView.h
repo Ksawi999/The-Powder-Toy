@@ -1,6 +1,4 @@
-#ifndef OPTIONSVIEW_H_
-#define OPTIONSVIEW_H_
-
+#pragma once
 #include "common/String.h"
 #include "gui/interface/Window.h"
 #include "gui/interface/ScrollPanel.h"
@@ -39,7 +37,8 @@ class OptionsView: public ui::Window
 	ui::Checkbox * momentumScroll;
 	ui::Checkbox * mouseClickRequired;
 	ui::Checkbox * includePressure;
-	ui::Checkbox * perfectCirclePressure;
+	ui::Checkbox * perfectCircle;
+	ui::Checkbox * graveExitsConsole;
 	ui::ScrollPanel * scrollPanel;
 	float customGravityX, customGravityY;
 	void UpdateAmbientAirTempPreview(float airTemp, bool isValid);
@@ -51,7 +50,4 @@ public:
 	void AttachController(OptionsController * c_);
 	void OnDraw() override;
 	void OnTryExit(ExitMethod method) override;
-	virtual ~OptionsView();
 };
-
-#endif /* OPTIONSVIEW_H_ */

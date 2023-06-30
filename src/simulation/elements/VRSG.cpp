@@ -7,7 +7,7 @@ void Element::Element_VRSG()
 {
 	Identifier = "DEFAULT_PT_VRSG";
 	Name = "VRSG";
-	Colour = PIXPACK(0xFE68FE);
+	Colour = 0xFE68FE_rgb;
 	MenuVisible = 0;
 	MenuSection = SC_GAS;
 	Enabled = 1;
@@ -34,6 +34,7 @@ void Element::Element_VRSG()
 	Description = "Gas Virus. Turns everything it touches into virus.";
 
 	Properties = TYPE_GAS|PROP_DEADLY;
+	CarriesTypeIn = 1U << FIELD_TMP2;
 
 	LowPressure = IPL;
 	LowPressureTransition = NT;

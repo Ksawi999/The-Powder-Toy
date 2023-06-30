@@ -1,10 +1,7 @@
-#ifndef SLIDER_H_
-#define SLIDER_H_
-
+#pragma once
 #include "Component.h"
 #include "Colour.h"
 #include "graphics/Pixel.h"
-
 #include <functional>
 
 namespace ui {
@@ -13,7 +10,7 @@ class Slider : public ui::Component
 	int sliderSteps;
 	int sliderPosition;
 	bool isMouseDown;
-	std::vector<pixel> bgGradient;
+	std::vector<RGB<uint8_t>> bgGradient;
 
 	struct SliderAction
 	{
@@ -40,4 +37,3 @@ public:
 };
 
 } /* namespace ui */
-#endif /* SLIDER_H_ */

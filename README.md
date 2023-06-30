@@ -1,4 +1,4 @@
-The Powder Toy - December 2022
+The Powder Toy - January 2023
 ==========================
 
 Get the latest version [from the Powder Toy website](https://powdertoy.co.uk/Download.html).
@@ -25,7 +25,7 @@ Thanks
 * Skresanov Savely
 * cracker64
 * Catelite
-* Bryan Hoyle
+* Victoria Hoyle
 * Nathan Cousins
 * jacksonmj
 * Felix Wallin
@@ -111,15 +111,16 @@ Controls
 Command Line
 ---------------------------------------------------------------------------
 
-| Command               | Description                                      | Example                           |
-| --------------------- | ------------------------------------------------ | --------------------------------- |
-| `scale:SIZE`          | Change window scale factor                       | `scale:2`                         |
-| `kiosk`               | Fullscreen mode                                  |                                   |
-| `proxy:SERVER[:PORT]` | Proxy server to use                              | `proxy:wwwcache.lancs.ac.uk:8080` |
-| `open FILE`           | Opens the file as a stamp or game save           |                                   |
-| `ddir DIRECTORY`      | Directory used for saving stamps and preferences |                                   |
-| `ptsave:SAVEID`       | Open online save, used by ptsave: URLs           | `ptsave:2198`                     |
-| `disable-network`     | Disables internet connections                    |                                   |
-| `redirect`            | Redirects output to stdout.txt / stderr.txt      |                                   |
+| Command               | Description                                      | Example                                     |
+| --------------------- | ------------------------------------------------ | --------------------------------------------|
+| `scale:SIZE`          | Change window scale factor                       | `scale:2`                                   |
+| `kiosk`               | Fullscreen mode                                  |                                             |
+| `proxy:SERVER[:PORT]` | Proxy server to use                              | `proxy:wwwcache.lancs.ac.uk:8080`           |
+| `open FILE`           | Opens the file as a stamp or game save           |                                             |
+| `ddir DIRECTORY`      | Directory used for saving stamps and preferences |                                             |
+| `ptsave:SAVEID`       | Open online save, used by ptsave: URLs           | `ptsave:2198`                               |
+| `disable-network`     | Disables internet connections                    |                                             |
+| `disable-bluescreen`  | Disable bluescreen handler                       |                                             |
+| `redirect`            | Redirects output to stdout.txt / stderr.txt      |                                             |
 | `cafile:CAFILE`       | Set certificate bundle path                      | `cafile:/etc/ssl/certs/ca-certificates.crt` |
-| `capath:CAPATH`       | Set certificate directory path                   | `capath:/etc/ssl/certs`           |
+| `capath:CAPATH`       | Set certificate directory path                   | `capath:/etc/ssl/certs`                     |
