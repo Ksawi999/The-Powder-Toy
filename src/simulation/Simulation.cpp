@@ -3103,7 +3103,7 @@ killed:
 						{
 							int cr = elements[TYP(r)].Colour.Red;
 							int cg = elements[TYP(r)].Colour.Green;
-							int cb = elements[TYP(r)].Colour.Blue
+							int cb = elements[TYP(r)].Colour.Blue;
 							if(TYP(r) == PT_SPRK)
 							{
 								cr = elements[parts[ID(r)].ctype].Colour.Red;
