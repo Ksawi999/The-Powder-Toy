@@ -63,6 +63,17 @@ void OptionsModel::SetWaterEqualisation(bool state)
 	notifySettingsChanged();
 }
 
+bool OptionsModel::GetPHOTImprovement()
+{
+	return sim->phot_enable;
+}
+
+void OptionsModel::SetPHOTImprovement(bool state)
+{
+	sim->phot_enable = state;
+	notifySettingsChanged();
+}
+
 int OptionsModel::GetAirMode()
 {
 	return sim->air->airMode;

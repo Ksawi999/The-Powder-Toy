@@ -101,6 +101,7 @@ public:
 	bool legacyEnable = false;
 	bool gravityEnable = false;
 	bool aheatEnable = false;
+	bool photEnable = false;
 	bool paused = false;
 	int gravityMode = 0;
 	float customGravityX = 0.0f;

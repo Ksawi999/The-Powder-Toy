@@ -969,6 +969,7 @@ void GameModel::SaveToSimParameters(const GameSave &saveData)
 	sim->legacy_enable = saveData.legacyEnable;
 	sim->water_equal_test = saveData.waterEEnabled;
 	sim->aheat_enable = saveData.aheatEnable;
+	sim->phot_enable = saveData.photEnable;
 	sim->EnableNewtonianGravity(saveData.gravityEnable);
 	sim->frameCount = saveData.frameCount;
 	if (saveData.hasRngState)

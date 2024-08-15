@@ -21,6 +21,8 @@ public:
 	void SetNewtonianGravity(bool state);
 	bool GetWaterEqualisation();
 	void SetWaterEqualisation(bool state);
+	bool GetPHOTImprovement();
+	void SetPHOTImprovement(bool state);
 	bool GetShowAvatars();
 	void SetShowAvatars(bool state);
 	int GetAirMode();

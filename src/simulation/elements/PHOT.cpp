@@ -60,7 +60,7 @@ static int update(UPDATE_FUNC_ARGS)
 	auto &sd = SimulationData::CRef();
 	auto &elements = sd.elements;
 
-	if(parts[i].dcolour && !(parts[i].flags & FLAG_PHOTOLD))
+	if(parts[i].dcolour && sim->phot_enable)
 	{
 		int cr = (parts[i].dcolour>>16)&0xFF, cg = (parts[i].dcolour>>8)&0xFF, cb = parts[i].dcolour&0xFF;
 		parts[i].dcolour = 0;
@@ -155,7 +155,7 @@ static int update(UPDATE_FUNC_ARGS)
 static int graphics(GRAPHICS_FUNC_ARGS)
 {
 	int templife = cpart->life, tempctype = cpart->ctype;
-	if(cpart->dcolour && !(cpart->flags & FLAG_PHOTOLD))
+	if(cpart->dcolour) // && sim->phot_enable
 	{
 		int cr = (cpart->dcolour>>16)&0xFF, cg = (cpart->dcolour>>8)&0xFF, cb = cpart->dcolour&0xFF;
 		tempctype = colourToWavelength(cr, cg, cb);
@@ -163,7 +163,7 @@ static int graphics(GRAPHICS_FUNC_ARGS)
 	}
 	
 	double lm = std::min(templife, 680) / 680.0;
-	if (templife <= 0 || (cpart->flags & FLAG_PHOTOLD))
+	if (templife <= 0) // || !sim->phot_enable
 		lm = 1.0;
 	RGB<uint8_t> tempcolor = wavelengthToColour(tempctype);
 	*firer = *colr = tempcolor.Red, *fireg = *colg = tempcolor.Green, *fireb = *colb = tempcolor.Blue;

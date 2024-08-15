@@ -460,6 +460,7 @@ void Simulation::SaveSimOptions(GameSave &gameSave)
 	gameSave.edgeMode = edgeMode;
 	gameSave.legacyEnable = legacy_enable;
 	gameSave.waterEEnabled = water_equal_test;
+	gameSave.photEnable = phot_enable;
 	gameSave.gravityEnable = bool(grav);
 	gameSave.aheatEnable = aheat_enable;
 }
@@ -1145,7 +1146,7 @@ int Simulation::eval_move(int pt, int nx, int ny, unsigned *rr) const
 		case PT_BIZR:
 		case PT_BIZRG:
 		case PT_BIZRS:
-			if(parts[ID(r)].dcolour && !(parts[ID(r)].flags & FLAG_PHOTOLD))
+			if(parts[ID(r)].dcolour && phot_enable)
 				result = 0;
 			else
 				result = 2;
@@ -2998,9 +2999,9 @@ killed:
 						int lt = TYP(pmap[y][x]);
 						int rt_glas = (rt == PT_GLAS) || (rt == PT_BGLA);
 						int lt_glas = (lt == PT_GLAS) || (lt == PT_BGLA);
-						if(!(parts[i].flags & FLAG_PHOTOLD))
+						if(phot_enable)
 						{
-							if(rt_glas && !(parts[ID(pmap[fin_y][fin_x])].flags & FLAG_PHOTOLD))
+							if(rt_glas)
 							{
 								int glasdeco = parts[ID(pmap[fin_y][fin_x])].dcolour;
 								if(glasdeco)
@@ -3009,7 +3010,7 @@ killed:
 									parts[i].ctype &= colourToWavelength(dr, dg, db);
 								}
 							}
-							if(lt_glas && !(parts[ID(pmap[y][x])].flags & FLAG_PHOTOLD))
+							if(lt_glas)
 							{
 								int glasdeco = parts[ID(pmap[y][x])].dcolour;
 								if(glasdeco)
@@ -3096,7 +3097,7 @@ killed:
 					if (t == PT_PHOT)
 					{
 						unsigned int mask = 0x3FFFFFFF;
-						if((parts[i].flags | parts[ID(r)].flags) & FLAG_PHOTOLD)
+						if(!phot_enable)
 							mask = elements[TYP(r)].PhotonReflectWavelengths;
 						else if (TYP(r) != PT_LITH)
 						{

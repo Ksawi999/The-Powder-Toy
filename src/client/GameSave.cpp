@@ -1246,8 +1246,6 @@ void GameSave::readOPS(const std::vector<char> &data)
 						}
 					}
 				}
-				if(savedVersion < 99)
-					particles[newIndex].flags |= FLAG_PHOTOLD;
 				if (PressureInTmp3(particles[newIndex].type))
 				{
 					// pavg[1] used to be saved as a u16, which PressureInTmp3 elements then treated as
@@ -2496,6 +2494,7 @@ std::pair<bool, std::vector<char>> GameSave::serialiseOPS() const
 	bson_append_finish_object(&b);
 
 
+	bson_append_bool(&b, "photEnable", photEnable);
 	bson_append_bool(&b, "waterEEnabled", waterEEnabled);
 	bson_append_bool(&b, "legacyEnable", legacyEnable);
 	bson_append_bool(&b, "gravityEnable", gravityEnable);
