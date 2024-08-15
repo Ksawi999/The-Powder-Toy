@@ -51,28 +51,23 @@ void Element::Element_BRAY()
 static int graphics(GRAPHICS_FUNC_ARGS)
 {
 	int trans = 255;
-	if(cpart->tmp==0)
+	if(cpart->tmp!=2)
 	{
-		trans = cpart->life * 7;
-		if (trans>255) trans = 255;
+		if(cpart->tmp==0)
+			trans = cpart->life * 7;
+		else if(cpart->tmp==1)
+			trans = cpart->life/4;
 		if (cpart->ctype&0x3FFFFFFF)
-			wavelengthToColour(cpart->ctype, *colr, *colg, *colb);
+				wavelengthToColour(cpart->ctype, *colr, *colg, *colb, gfctx.sim->phot_enable);
 	}
-	else if(cpart->tmp==1)
-	{
-		trans = cpart->life/4;
-		if (trans>255) trans = 255;
-		if (cpart->ctype&0x3FFFFFFF)
-			wavelengthToColour(cpart->ctype, *colr, *colg, *colb);
-	}
-	else if(cpart->tmp==2)
+	else
 	{
 		trans = cpart->life*100;
-		if (trans>255) trans = 255;
 		*colr = 255;
 		*colg = 150;
 		*colb = 50;
 	}
+	if (trans>255) trans = 255;
 	*cola = trans;
 	*pixel_mode &= ~PMODE;
 	*pixel_mode |= PMODE_BLEND | PMODE_GLOW;

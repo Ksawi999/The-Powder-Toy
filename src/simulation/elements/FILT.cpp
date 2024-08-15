@@ -51,7 +51,7 @@ void Element::Element_FILT()
 static int graphics(GRAPHICS_FUNC_ARGS)
 {
 	int wl = Element_FILT_getWavelengths(cpart);
-	wavelengthToColour(wl, *colr, *colg, *colb);
+	wavelengthToColour(wl, *colr, *colg, *colb, gfctx.sim->phot_enable);
 	
 	if (cpart->life>0 && cpart->life<=4)
 		*cola = 127+cpart->life*30;

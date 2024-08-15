@@ -155,7 +155,7 @@ static int update(UPDATE_FUNC_ARGS)
 static int graphics(GRAPHICS_FUNC_ARGS)
 {
 	int templife = cpart->life, tempctype = cpart->ctype;
-	if(cpart->dcolour) // && sim->phot_enable
+	if(cpart->dcolour && gfctx.sim->phot_enable)
 	{
 		int cr = (cpart->dcolour>>16)&0xFF, cg = (cpart->dcolour>>8)&0xFF, cb = cpart->dcolour&0xFF;
 		tempctype = colourToWavelength(cr, cg, cb);
@@ -163,9 +163,9 @@ static int graphics(GRAPHICS_FUNC_ARGS)
 	}
 	
 	double lm = std::min(templife, 680) / 680.0;
-	if (templife <= 0) // || !sim->phot_enable
+	if (templife <= 0 || !gfctx.sim->phot_enable)
 		lm = 1.0;
-	wavelengthToColour(tempctype, *colr, *colg, *colb);
+	wavelengthToColour(tempctype, *colr, *colg, *colb, gfctx.sim->phot_enable);
 	*firer = *colr, *fireg = *colg, *fireb = *colb;
 	*firea = round(100.0 * lm);
 	*cola = round(255.0 * lm);

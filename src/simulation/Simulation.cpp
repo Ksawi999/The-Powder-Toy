@@ -3109,7 +3109,7 @@ killed:
 								cb = elements[parts[ID(r)].ctype].Colour.Blue;
 							}
 							else if (TYP(r) == PT_BRAY || TYP(r) == PT_BIZR || TYP(r) == PT_BIZRG || TYP(r) == PT_BIZRS)
-								wavelengthToColour(parts[ID(r)].ctype, cr, cg, cb);
+								wavelengthToColour(parts[ID(r)].ctype, cr, cg, cb, phot_enable);
 							else
 							{
 								cr = elements[TYP(r)].Colour.Red;
