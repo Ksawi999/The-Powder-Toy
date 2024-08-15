@@ -116,8 +116,9 @@ static int update(UPDATE_FUNC_ARGS)
 									colored = 0xFF000000;
 								else if (parts[ID(r)].tmp==0)
 								{
-									RGB<uint8_t> tempcolor = wavelengthToColour(Element_FILT_getWavelengths(&parts[ID(r)]));
-									colored = 0xFF000000 | (int)(tempcolor.Red) << 16 | (int)(tempcolor.Green) << 8 | (int)(tempcolor.Blue);
+									int colr, colg, colb;
+									wavelengthToColour(Element_FILT_getWavelengths(&parts[ID(r)]), colr, colg, colb, sim->phot_enable);
+									colored = 0xFF000000 | colr << 16 | colg << 8 | colb;
 								}
 								else if (colored==0xFF000000)
 									colored = 0;

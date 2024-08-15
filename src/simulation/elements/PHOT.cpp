@@ -165,8 +165,8 @@ static int graphics(GRAPHICS_FUNC_ARGS)
 	double lm = std::min(templife, 680) / 680.0;
 	if (templife <= 0) // || !sim->phot_enable
 		lm = 1.0;
-	RGB<uint8_t> tempcolor = wavelengthToColour(tempctype);
-	*firer = *colr = tempcolor.Red, *fireg = *colg = tempcolor.Green, *fireb = *colb = tempcolor.Blue;
+	wavelengthToColour(tempctype, *colr, *colg, *colb);
+	*firer = *colr, *fireg = *colg, *fireb = *colb;
 	*firea = round(100.0 * lm);
 	*cola = round(255.0 * lm);
 

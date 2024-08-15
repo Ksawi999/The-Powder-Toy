@@ -51,8 +51,7 @@ void Element::Element_FILT()
 static int graphics(GRAPHICS_FUNC_ARGS)
 {
 	int wl = Element_FILT_getWavelengths(cpart);
-	RGB<uint8_t> tempcolor = wavelengthToColour(wl);
-	*colr = tempcolor.Red, *colg = tempcolor.Green, *colb = tempcolor.Blue;
+	wavelengthToColour(wl, *colr, *colg, *colb);
 	
 	if (cpart->life>0 && cpart->life<=4)
 		*cola = 127+cpart->life*30;
@@ -187,17 +186,32 @@ int colourToWavelength(int cr, int cg, int cb)
 	return mask &= 0x3FFFFFFF;
 }
 
-RGB<uint8_t> wavelengthToColour(int wavelength)
+void wavelengthToColour(int wavelength, int &colr, int &colg, int &colb, bool photnew)
 {
-	int x, colr, colg, colb;
+	int x;
 	for (colr = colg = colb = x = 0; x<12; x++) {
 		colr += (wavelength >> (x+18)) & 1;
 		colg += (wavelength >> (x+9))  & 1;
 		colb += (wavelength >>  x)	   & 1;
 	}
-	double xl = 255.0 / std::max({colr,colg,colb});
-	colr *= xl;
-	colg *= xl;
-	colb *= xl;
-	return RGB<uint8_t>(colr, colg, colb);
+	if (photnew)
+	{
+		double xl = 255.0 / std::max({colr,colg,colb});
+		colr *= xl;
+		colg *= xl;
+		colb *= xl;
+	}
+	else
+	{
+		x = 624 / (colr + colg + colb + 1);
+		colr *= x;
+		colg *= x;
+		colb *= x;
+	}
+	if(colr > 255) colr = 255;
+	else if(colr < 0) colr = 0;
+	if(colg > 255) colg = 255;
+	else if(colg < 0) colg = 0;
+	if(colb > 255) colb = 255;
+	else if(colb < 0) colb = 0;
 }

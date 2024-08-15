@@ -94,10 +94,7 @@ int Element_BIZR_graphics(GRAPHICS_FUNC_ARGS)
 {
 	float brightness = fabs(cpart->vx) + fabs(cpart->vy);
 	if (cpart->ctype&0x3FFFFFFF)
-	{
-		RGB<uint8_t> tempcolor = wavelengthToColour(cpart->ctype);
-		*colr = tempcolor.Red, *colg = tempcolor.Green, *colb = tempcolor.Blue;
-	}
+		wavelengthToColour(cpart->ctype, *colr, *colg, *colb);
 
 	if(brightness>0)
 	{

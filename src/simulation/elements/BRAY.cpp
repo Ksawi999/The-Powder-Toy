@@ -55,19 +55,15 @@ static int graphics(GRAPHICS_FUNC_ARGS)
 	{
 		trans = cpart->life * 7;
 		if (trans>255) trans = 255;
-		if (cpart->ctype&0x3FFFFFFF) {
-			RGB<uint8_t> tempcolor = wavelengthToColour(cpart->ctype);
-			*colr = tempcolor.Red, *colg = tempcolor.Green, *colb = tempcolor.Blue;
-		}
+		if (cpart->ctype&0x3FFFFFFF)
+			wavelengthToColour(cpart->ctype, *colr, *colg, *colb);
 	}
 	else if(cpart->tmp==1)
 	{
 		trans = cpart->life/4;
 		if (trans>255) trans = 255;
-		if (cpart->ctype&0x3FFFFFFF) {
-			RGB<uint8_t> tempcolor = wavelengthToColour(cpart->ctype);
-			*colr = tempcolor.Red, *colg = tempcolor.Green, *colb = tempcolor.Blue;
-		}
+		if (cpart->ctype&0x3FFFFFFF)
+			wavelengthToColour(cpart->ctype, *colr, *colg, *colb);
 	}
 	else if(cpart->tmp==2)
 	{
