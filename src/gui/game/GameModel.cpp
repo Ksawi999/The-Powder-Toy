@@ -113,6 +113,7 @@ GameModel::GameModel():
 	}
 	sim->aheat_enable = prefs.Get("Simulation.AmbientHeat", 0); // TODO: AmbientHeat enum
 	sim->pretty_powder = prefs.Get("Simulation.PrettyPowder", 0); // TODO: PrettyPowder enum
+	sim->wavelength_mode = prefs.Get("Simulation.WavelengthMode", 3);
 
 	Favorite::Ref().LoadFavoritesFromPrefs();
 
@@ -171,6 +172,7 @@ GameModel::~GameModel()
 		prefs.Set("Simulation.NewtonianGravity", bool(sim->grav));
 		prefs.Set("Simulation.AmbientHeat", sim->aheat_enable);
 		prefs.Set("Simulation.PrettyPowder", sim->pretty_powder);
+		prefs.Set("Simulation.WavelengthMode", sim->wavelength_mode);
 		prefs.Set("Decoration.Red", (int)colour.Red);
 		prefs.Set("Decoration.Green", (int)colour.Green);
 		prefs.Set("Decoration.Blue", (int)colour.Blue);
@@ -969,7 +971,7 @@ void GameModel::SaveToSimParameters(const GameSave &saveData)
 	sim->legacy_enable = saveData.legacyEnable;
 	sim->water_equal_test = saveData.waterEEnabled;
 	sim->aheat_enable = saveData.aheatEnable;
-	sim->phot_enable = saveData.photEnable;
+	sim->wavelength_mode = saveData.wavelengthMode;
 	sim->EnableNewtonianGravity(saveData.gravityEnable);
 	sim->frameCount = saveData.frameCount;
 	if (saveData.hasRngState)

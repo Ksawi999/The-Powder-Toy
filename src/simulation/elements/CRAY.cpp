@@ -117,7 +117,7 @@ static int update(UPDATE_FUNC_ARGS)
 								else if (parts[ID(r)].tmp==0)
 								{
 									int colr, colg, colb;
-									wavelengthToColour(Element_FILT_getWavelengths(&parts[ID(r)]), colr, colg, colb, sim->phot_enable);
+									wavelengthToColour(Element_FILT_getWavelengths(&parts[ID(r)]), colr, colg, colb, sim->wavelength_mode);
 									colored = 0xFF000000 | colr << 16 | colg << 8 | colb;
 								}
 								else if (colored==0xFF000000)

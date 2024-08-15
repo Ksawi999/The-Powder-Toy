@@ -63,14 +63,14 @@ void OptionsModel::SetWaterEqualisation(bool state)
 	notifySettingsChanged();
 }
 
-bool OptionsModel::GetPHOTImprovement()
+int OptionsModel::GetWavelengthMode()
 {
-	return sim->phot_enable;
+	return sim->wavelength_mode;
 }
 
-void OptionsModel::SetPHOTImprovement(bool state)
+void OptionsModel::SetWavelengthMode(int wavelengthMode)
 {
-	sim->phot_enable = state;
+	sim->wavelength_mode = wavelengthMode;
 	notifySettingsChanged();
 }
 

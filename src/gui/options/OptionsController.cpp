@@ -37,9 +37,9 @@ void OptionsController::SetWaterEqualisation(bool state)
 	model->SetWaterEqualisation(state);
 }
 
-void OptionsController::SetPHOTImprovement(bool state)
+void OptionsController::SetWavelengthMode(int wavelengthMode)
 {
-	model->SetPHOTImprovement(state);
+	model->SetWavelengthMode(wavelengthMode);
 }
 
 void OptionsController::SetGravityMode(int gravityMode)

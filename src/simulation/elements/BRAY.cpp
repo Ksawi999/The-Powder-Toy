@@ -58,7 +58,7 @@ static int graphics(GRAPHICS_FUNC_ARGS)
 		else if(cpart->tmp==1)
 			trans = cpart->life/4;
 		if (cpart->ctype&0x3FFFFFFF)
-				wavelengthToColour(cpart->ctype, *colr, *colg, *colb, gfctx.sim->phot_enable);
+			wavelengthToColour(cpart->ctype, *colr, *colg, *colb, gfctx.sim->wavelength_mode);
 	}
 	else
 	{

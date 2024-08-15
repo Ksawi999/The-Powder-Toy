@@ -460,7 +460,7 @@ void Simulation::SaveSimOptions(GameSave &gameSave)
 	gameSave.edgeMode = edgeMode;
 	gameSave.legacyEnable = legacy_enable;
 	gameSave.waterEEnabled = water_equal_test;
-	gameSave.photEnable = phot_enable;
+	gameSave.wavelengthMode = wavelength_mode;
 	gameSave.gravityEnable = bool(grav);
 	gameSave.aheatEnable = aheat_enable;
 }
@@ -1146,7 +1146,7 @@ int Simulation::eval_move(int pt, int nx, int ny, unsigned *rr) const
 		case PT_BIZR:
 		case PT_BIZRG:
 		case PT_BIZRS:
-			if(parts[ID(r)].dcolour && phot_enable)
+			if(parts[ID(r)].dcolour && wavelength_mode > 2)
 				result = 0;
 			else
 				result = 2;
@@ -2999,7 +2999,7 @@ killed:
 						int lt = TYP(pmap[y][x]);
 						int rt_glas = (rt == PT_GLAS) || (rt == PT_BGLA);
 						int lt_glas = (lt == PT_GLAS) || (lt == PT_BGLA);
-						if(phot_enable)
+						if(wavelength_mode)
 						{
 							if(rt_glas)
 							{
@@ -3097,7 +3097,7 @@ killed:
 					if (t == PT_PHOT)
 					{
 						unsigned int mask = 0x3FFFFFFF;
-						if(!phot_enable)
+						if(wavelength_mode < 2)
 							mask = elements[TYP(r)].PhotonReflectWavelengths;
 						else if (TYP(r) != PT_LITH)
 						{
@@ -3109,14 +3109,14 @@ killed:
 								cb = elements[parts[ID(r)].ctype].Colour.Blue;
 							}
 							else if (TYP(r) == PT_BRAY || TYP(r) == PT_BIZR || TYP(r) == PT_BIZRG || TYP(r) == PT_BIZRS)
-								wavelengthToColour(parts[ID(r)].ctype, cr, cg, cb, phot_enable);
+								wavelengthToColour(parts[ID(r)].ctype, cr, cg, cb, wavelength_mode);
 							else
 							{
 								cr = elements[TYP(r)].Colour.Red;
 								cg = elements[TYP(r)].Colour.Green;
 								cb = elements[TYP(r)].Colour.Blue;
 							}
-							if (parts[ID(r)].dcolour)
+							if (parts[ID(r)].dcolour && wavelength_mode > 2)
 							{
 								int da = (parts[ID(r)].dcolour>>24)&0xFF;
 								int dr = (parts[ID(r)].dcolour>>16)&0xFF;

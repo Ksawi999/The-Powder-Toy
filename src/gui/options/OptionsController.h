@@ -17,7 +17,7 @@ public:
 	void SetAmbientHeatSimulation(bool state);
 	void SetNewtonianGravity(bool state);
 	void SetWaterEqualisation(bool state);
-	void SetPHOTImprovement(bool state);
+	void SetWavelengthMode(int wavelengthMode);
 	void SetGravityMode(int gravityMode);
 	void SetCustomGravityX(float x);
 	void SetCustomGravityY(float y);

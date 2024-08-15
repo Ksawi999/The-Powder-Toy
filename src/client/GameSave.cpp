@@ -560,6 +560,7 @@ void GameSave::readOPS(const std::vector<char> &data)
 		CheckBsonFieldBool(iter, "gravityEnable", &gravityEnable);
 		CheckBsonFieldBool(iter, "aheat_enable", &aheatEnable);
 		CheckBsonFieldBool(iter, "waterEEnabled", &waterEEnabled);
+		CheckBsonFieldInt(iter, "wavelengthMode", &wavelengthMode);
 		CheckBsonFieldBool(iter, "paused", &paused);
 		CheckBsonFieldInt(iter, "gravityMode", &gravityMode);
 		CheckBsonFieldFloat(iter, "customGravityX", &customGravityX);
@@ -2494,7 +2495,7 @@ std::pair<bool, std::vector<char>> GameSave::serialiseOPS() const
 	bson_append_finish_object(&b);
 
 
-	bson_append_bool(&b, "photEnable", photEnable);
+	bson_append_int(&b, "wavelengthMode", wavelengthMode);
 	bson_append_bool(&b, "waterEEnabled", waterEEnabled);
 	bson_append_bool(&b, "legacyEnable", legacyEnable);
 	bson_append_bool(&b, "gravityEnable", gravityEnable);
