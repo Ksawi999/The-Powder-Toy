@@ -146,7 +146,7 @@ int colourToWavelength(int cr, int cg, int cb)
 	int mt = 5;
 	int best = 1000;
 	int bestmt = mt;
-	int vr, vg, vb;
+	int vr, vg, vb, vc = 0, vy = 0;
 	for (; mt < 13; mt++)
 	{
 		vr = (int)(cr / vl * mt + 0.5f);
@@ -166,22 +166,14 @@ int colourToWavelength(int cr, int cg, int cb)
 	vr = (int)(cr / vl * mt + 0.5f);
 	vg = (int)(cg / vl * mt + 0.5f);
 	vb = (int)(cb / vl * mt + 0.5f);
-	int shg = 0;
-	if (vg > 6)
-	{
-		shg = std::max({std::min({vr - vb, vg - 6, 3}), 6 - vg, -3});
-		vr -= std::max(shg, 0);
-		vb += std::min(shg, 0);
-	}
-	else
-	{
-		if (vb > 9)
-			vg -= vb - 9;
-		if (vr > 9)
-			vg -= vr - 9;
-	}
+	vc = std::max({vb - 9, 0, std::min(vg - 6, vb)});
+	vg -= vc, vb -= vc;
+	vy = std::max({vr - 9, 0, vg - 6});
+	vg -= vy, vr -= vy;
 	unsigned int mask = ((1 << vr) - 1) << (30 - vr);
-	mask |= ((1 << vg) - 1) << (12 + shg);
+	mask |= ((1 << vy) - 1) << (21 - vy);
+	mask |= ((1 << vg) - 1) << (15 - vg / 2);
+	mask |= ((1 << vc) - 1) << 9;
 	mask |= ((1 << vb) - 1);
 	return mask &= 0x3FFFFFFF;
 }
