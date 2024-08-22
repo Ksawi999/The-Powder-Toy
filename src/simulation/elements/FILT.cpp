@@ -166,7 +166,7 @@ int colourToWavelength(int cr, int cg, int cb)
 	vr = (int)(cr / vl * mt + 0.5f);
 	vg = (int)(cg / vl * mt + 0.5f);
 	vb = (int)(cb / vl * mt + 0.5f);
-	vc = std::max({vb - 9, 0, std::min(vg - 6, vb)});
+	vc = std::min(std::max({vb - 9, 0, std::min(vg - 6, vb)}), 3);
 	vg -= vc, vb -= vc;
 	vy = std::max({vr - 9, 0, vg - 6});
 	vg -= vy, vr -= vy;
