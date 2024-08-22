@@ -152,7 +152,7 @@ int colourToWavelength(int cr, int cg, int cb)
 		vr = (int)(cr / vl * mt + 0.5f);
 		vg = (int)(cg / vl * mt + 0.5f);
 		vb = (int)(cb / vl * mt + 0.5f);
-		if ((mt < 7 || vr + vb >= mt - 6) && (mt < 10 || vg >= std::max(vr - 9, 0) + std::max(vb - 9, 0)))
+		if ((mt < 7 || std::min(vr, 3) + std::min(vb, 3) >= vg - 6) && (mt < 10 || vg >= std::max(vr - 9, 0) + std::max(vb - 9, 0)))
 		{
 			int diff = std::abs(cr - vr * vl / mt) + std::abs(cg - vg * vl / mt) + std::abs(cb - vb * vl / mt);
 			if (diff <= best)
@@ -166,7 +166,7 @@ int colourToWavelength(int cr, int cg, int cb)
 	vr = (int)(cr / vl * mt + 0.5f);
 	vg = (int)(cg / vl * mt + 0.5f);
 	vb = (int)(cb / vl * mt + 0.5f);
-	vc = std::min(std::max({vb - 9, 0, std::min(vg - 6, vb)}), 3);
+	vc = std::max({vb - 9, 0, std::min({vg - 6, vb, 3})});
 	vg -= vc, vb -= vc;
 	vy = std::max({vr - 9, 0, vg - 6});
 	vg -= vy, vr -= vy;
