@@ -2418,7 +2418,7 @@ void SimulationImpl::UpdateParticles(int start, int end)
 		if (transitionOccurred)
 			continue;
 
-		if (!parts[i].vx&&!parts[i].vy)//if its not moving, skip to next particle, movement code it next
+		if (std::abs(parts[i].vx) < 1e-7 && std::abs(parts[i].vy) < 1e-7)//if its not moving, skip to next particle, movement code it next
 			continue;
 
 		MovementPhase(i, neighbourhood);
