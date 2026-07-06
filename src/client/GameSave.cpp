@@ -2442,6 +2442,10 @@ std::pair<bool, std::vector<char>> GameSave::serialiseOPS() const
 			{
 				RESTRICTVERSION(100, 0);
 			}
+			if (part.type == PT_RPEL && part.tmp)
+			{
+				RESTRICTVERSION(100, 1);
+			}
 
 			//Get the pmap entry for the next particle in the same position
 			i = partsPosLink[i];

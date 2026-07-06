@@ -51,24 +51,25 @@ static int update(UPDATE_FUNC_ARGS)
 {
 	auto &sd = SimulationData::CRef();
 	auto &elements = sd.elements;
-	int r, rx, ry, ri;
-	for(ri = 0; ri <= 10; ri++)
-	{
-		rx = sim->rng.between(-10, 10);
-		ry = sim->rng.between(-10, 10);
-		if (x+rx >= 0 && x+rx < XRES && y+ry >= 0 && y+ry < YRES && (rx || ry))
-		{
-			r = pmap[y+ry][x+rx];
-			if (!r)
-				r = sim->photons[y+ry][x+rx];
+	int r, rx, ry, rd = 10;
+	if (parts[i].tmp > 25)
+        parts[i].tmp = 25;
+    if (parts[i].tmp > 0)
+        rd = parts[i].tmp;
+	for (rx = -rd; rx <= rd; rx++)
+		for (ry = -rd; ry <= rd; ry++)
+            if (x+rx >= 0 && x+rx < XRES && y+ry >= 0 && y+ry < YRES && (rx || ry))
+            {
+                r = pmap[y+ry][x+rx];
+                if (!r)
+                    r = sim->photons[y+ry][x+rx];
 
-			if (r && !(elements[TYP(r)].Properties & TYPE_SOLID)) {
-				if (!parts[i].ctype || parts[i].ctype == parts[ID(r)].type) {
-					parts[ID(r)].vx = restrict_flt(parts[ID(r)].vx + isign(rx)*((parts[i].temp-273.15)/10.0f), -MAX_VELOCITY, MAX_VELOCITY);
-					parts[ID(r)].vy = restrict_flt(parts[ID(r)].vy + isign(ry)*((parts[i].temp-273.15)/10.0f), -MAX_VELOCITY, MAX_VELOCITY);
-				}
-			}
-		}
-	}
+                if (r && !(elements[TYP(r)].Properties & TYPE_SOLID)) {
+                    if (!parts[i].ctype || parts[i].ctype == parts[ID(r)].type) {
+                        parts[ID(r)].vx = restrict_flt(parts[ID(r)].vx + isign(rx)*((parts[i].temp-273.15)/10.0f), -MAX_VELOCITY, MAX_VELOCITY);
+                        parts[ID(r)].vy = restrict_flt(parts[ID(r)].vy + isign(ry)*((parts[i].temp-273.15)/10.0f), -MAX_VELOCITY, MAX_VELOCITY);
+                    }
+                }
+            }
 	return 0;
 }
