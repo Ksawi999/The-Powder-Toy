@@ -51,14 +51,16 @@ static int update(UPDATE_FUNC_ARGS)
 {
 	auto &sd = SimulationData::CRef();
 	auto &elements = sd.elements;
-	int r, rx, ry, rd = 10;
+	int r, rx, ry, rd = 10, softness = 44;
 	if (parts[i].tmp > 25)
         parts[i].tmp = 25;
     if (parts[i].tmp > 0)
         rd = parts[i].tmp;
+    if (parts[i].tmp2 > 0)
+        softness = parts[i].tmp2;
 	for (rx = -rd; rx <= rd; rx++)
 		for (ry = -rd; ry <= rd; ry++)
-            if (x+rx >= 0 && x+rx < XRES && y+ry >= 0 && y+ry < YRES && (rx || ry))
+            if (x+rx >= 0 && x+rx < XRES && y+ry >= 0 && y+ry < YRES && (rx || ry) && !rng.chance(1, softness))
             {
                 r = pmap[y+ry][x+rx];
                 if (!r)

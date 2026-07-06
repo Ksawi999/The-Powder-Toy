@@ -2442,7 +2442,7 @@ std::pair<bool, std::vector<char>> GameSave::serialiseOPS() const
 			{
 				RESTRICTVERSION(100, 0);
 			}
-			if (part.type == PT_RPEL && part.tmp)
+			if (part.type == PT_RPEL && (part.tmp || part.tmp2))
 			{
 				RESTRICTVERSION(100, 1);
 			}
