@@ -60,7 +60,7 @@ static int update(UPDATE_FUNC_ARGS)
         softness = parts[i].tmp2;
 	for (rx = -rd; rx <= rd; rx++)
 		for (ry = -rd; ry <= rd; ry++)
-            if (x+rx >= 0 && x+rx < XRES && y+ry >= 0 && y+ry < YRES && (rx || ry) && !rng.chance(1, softness))
+            if (x+rx >= 0 && x+rx < XRES && y+ry >= 0 && y+ry < YRES && (rx || ry) && !sim->rng.chance(1, softness))
             {
                 r = pmap[y+ry][x+rx];
                 if (!r)
