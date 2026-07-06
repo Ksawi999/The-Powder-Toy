@@ -1044,9 +1044,9 @@ void GameView::updateToolButtonScroll()
 
 		if (scrollSize > XRES - 1)
 			scrollSize = XRES - 1;
-		
+
 		if (totalWidth > XRES - 15)
-		{			
+		{
 			int mouseX = x;
 
 			float overflow = 0;
@@ -2446,7 +2446,7 @@ void GameView::OnDraw()
 				if (type == PT_CRAY || type == PT_DRAY || type == PT_EXOT || type == PT_LIGH || type == PT_SOAP || type == PT_TRON
 						|| type == PT_VIBR || type == PT_VIRS || type == PT_WARP || type == PT_LCRY || type == PT_CBNW || type == PT_TSNS
 						|| type == PT_DTEC || type == PT_LSNS || type == PT_PSTN || type == PT_LDTC || type == PT_VSNS || type == PT_LITH
-						|| type == PT_CONV || type == PT_ETRD)
+						|| type == PT_CONV || type == PT_ETRD || type == PT_RPEL)
 					sampleInfo << ", Tmp2: " << sample.particle.tmp2;
 
 				sampleInfo << ", Pressure: " << sample.AirPressure;
