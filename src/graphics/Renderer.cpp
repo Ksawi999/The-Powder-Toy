@@ -532,7 +532,7 @@ void Renderer::render_parts()
 						{
 							auto dx = parts[parts[i].tmp].x - nx;
 							auto dy = parts[parts[i].tmp].y - ny;
-							Element_SOAP_neighourLoop(dx, dy);
+							Element_SOAP_neighourLoop(sim->edgeMode, dx, dy);
 							BlendLine({ nx, ny }, { int(nx + dx + 0.5f), int(ny + dy + 0.5f) }, RGBA(colr, colg, colb, cola));
 						}
 					}

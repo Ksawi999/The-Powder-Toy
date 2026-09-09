@@ -109,6 +109,7 @@ struct RenderableSimulation
 	int pmap[YRES][XRES];
 	int photons[YRES][XRES];
 
+	int edgeMode = EDGE_VOID;
 	int aheat_enable = 0;
 
 	bool useLuaCallbacks = false;
@@ -151,7 +152,6 @@ public:
 
 	unsigned int pmap_count[YRES][XRES];
 
-	int edgeMode = EDGE_VOID;
 	int gravityMode = GRAV_VERTICAL;
 	float customGravityX = 0;
 	float customGravityY = 0;
