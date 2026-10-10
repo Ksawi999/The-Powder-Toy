@@ -50,7 +50,10 @@ static int update(UPDATE_FUNC_ARGS)
 {
 	int ttan = 0;
 	if (nt <= 2)
+	{
 		ttan = 2;
+		parts[i].type = PT_LOLZ;
+	}
 	else if (parts[i].tmp)
 		ttan = 2;
 	else if (nt <= 6)
