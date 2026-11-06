@@ -2222,18 +2222,10 @@ std::pair<bool, std::vector<char>> GameSave::serialiseOPS() const
 
 			//Extra Temperature (2nd byte optional, 1st required), 1 to 2 bytes
 			//Store temperature as an offset of 21C(294.15K) or go into a 16byte int and store the whole thing
-			if(fabs(part.temp-294.15f)<127)
-			{
-				tempTemp = int(floor(part.temp-294.15f+0.5f));
-				partsData[partsDataLen++] = tempTemp;
-			}
-			else
-			{
-				fieldDesc |= 1;
-				tempTemp = (int)(part.temp+0.5f);
-				partsData[partsDataLen++] = tempTemp;
-				partsData[partsDataLen++] = tempTemp >> 8;
-			}
+			fieldDesc |= 1;
+			tempTemp = (int)(part.temp+0.5f);
+			partsData[partsDataLen++] = tempTemp;
+			partsData[partsDataLen++] = tempTemp >> 8;
 
 			if (fieldDesc & (1 << 15))
 			{
@@ -2241,21 +2233,15 @@ std::pair<bool, std::vector<char>> GameSave::serialiseOPS() const
 			}
 
 			//Life (optional), 1 to 2 bytes
-			if(part.life)
-			{
-				int life = part.life;
-				if (life > 0xFFFF)
-					life = 0xFFFF;
-				else if (life < 0)
-					life = 0;
-				fieldDesc |= 1 << 1;
-				partsData[partsDataLen++] = life;
-				if (life & 0xFF00)
-				{
-					fieldDesc |= 1 << 2;
-					partsData[partsDataLen++] = life >> 8;
-				}
-			}
+			int life = part.life;
+			if (life > 0xFFFF)
+				life = 0xFFFF;
+			else if (life < 0)
+				life = 0;
+			fieldDesc |= 1 << 1;
+			partsData[partsDataLen++] = life;
+			fieldDesc |= 1 << 2;
+			partsData[partsDataLen++] = life >> 8;
 
 			//Tmp (optional), 1, 2, or 4 bytes
 			if(part.tmp)
@@ -2276,18 +2262,12 @@ std::pair<bool, std::vector<char>> GameSave::serialiseOPS() const
 			}
 
 			//Ctype (optional), 1 or 4 bytes
-			if(part.ctype)
-			{
-				fieldDesc |= 1 << 5;
-				partsData[partsDataLen++] = part.ctype;
-				if(part.ctype & 0xFFFFFF00)
-				{
-					fieldDesc |= 1 << 9;
-					partsData[partsDataLen++] = (part.ctype&0xFF000000)>>24;
-					partsData[partsDataLen++] = (part.ctype&0x00FF0000)>>16;
-					partsData[partsDataLen++] = (part.ctype&0x0000FF00)>>8;
-				}
-			}
+			fieldDesc |= 1 << 5;
+			partsData[partsDataLen++] = part.ctype;
+			fieldDesc |= 1 << 9;
+			partsData[partsDataLen++] = (part.ctype&0xFF000000)>>24;
+			partsData[partsDataLen++] = (part.ctype&0x00FF0000)>>16;
+			partsData[partsDataLen++] = (part.ctype&0x0000FF00)>>8;
 
 			//Dcolour (optional), 4 bytes
 			if(part.dcolour && (part.dcolour & 0xFF000000 || part.type == PT_LIFE))
