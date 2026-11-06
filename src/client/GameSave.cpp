@@ -2269,16 +2269,6 @@ std::pair<bool, std::vector<char>> GameSave::serialiseOPS() const
 			partsData[partsDataLen++] = (part.ctype&0x00FF0000)>>16;
 			partsData[partsDataLen++] = (part.ctype&0x0000FF00)>>8;
 
-			//Dcolour (optional), 4 bytes
-			if(part.dcolour && (part.dcolour & 0xFF000000 || part.type == PT_LIFE))
-			{
-				fieldDesc |= 1 << 6;
-				partsData[partsDataLen++] = (part.dcolour&0xFF000000)>>24;
-				partsData[partsDataLen++] = (part.dcolour&0x00FF0000)>>16;
-				partsData[partsDataLen++] = (part.dcolour&0x0000FF00)>>8;
-				partsData[partsDataLen++] = (part.dcolour&0x000000FF);
-			}
-
 			//VX (optional), 1 byte
 			if(fabs(part.vx) > 0.001f)
 			{
